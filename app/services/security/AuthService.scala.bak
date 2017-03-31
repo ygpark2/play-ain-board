@@ -1,0 +1,94 @@
+package services.security
+
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
+
+import common.enums.{UserRole, UserStatus}
+import db.slick.errors.{SlickError, NotFound}
+import db.slick.BaseRepositoryService
+import db.slick.SlickServiceResults.{SlickMaybeError, SlickResult}
+import models.Tables.{Users, UsersRow}
+import models.UsersTable.{UserIDTag, UserID}
+import org.mindrot.jbcrypt.BCrypt
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{Format, Json}
+import services.RedisService
+import services.RedisService.RedisObject
+
+import scala.concurrent.{ExecutionContext, Future}
+
+/**
+  * @author Maxim Ochenashko
+  */
+@Singleton
+class AuthService @Inject()(redisService: RedisService,
+                            val dbConfigProvider: DatabaseConfigProvider)
+                           (implicit ec: ExecutionContext) extends BaseRepositoryService {
+
+  import AuthService._
+  import driver.api._
+  import scalaz._
+  import Scalaz._
+  import OptionT._
+
+  def loadToken(key: String): Future[Option[AuthToken]] =
+    redisService get key
+
+  def authenticate(key: String): Future[Option[AuthInfo]] =
+    (for {
+      token <- optionT(loadToken(key))
+    } yield token.authInfo).run
+
+  def authorize(authInfo: AuthInfo, rememberMe: Boolean): Future[String] = {
+    val token = AuthToken(UUID.randomUUID.toString, authInfo)
+    val expirationTime = rememberMe ? DefaultRememberMeSeconds | DefaultExpireSeconds
+    redisService.save(token, expirationTime) collect { case success if success => token.key }
+  }
+
+  def authenticate(email: String, password: String): Future[SlickResult[UsersRow]] =
+    for {
+      row <- db.run(UserByEmailQuery(email).result.headOption)
+      pwdFiltered = row filter { u => u.password == BCrypt.hashpw(password, u.salt) }
+    } yield pwdFiltered.fold[SlickError \/ UsersRow](NotFound.left)(_.right)
+
+  def logout(key: String): Unit =
+    redisService delete key
+
+  def userExists(email: String): Future[SlickMaybeError] =
+    executeExists(UserByEmailQuery(email).extract)
+
+  def createUser(firstName: String, lastName: String, email: String,
+                 password: String, userRole: UserRole): Future[SlickMaybeError] = {
+    val salt = BCrypt.gensalt()
+    val encodedPassword = BCrypt.hashpw(password, salt)
+
+    val newUser = UsersRow(UserID(newUuid), now, now, firstName, lastName, email,
+      UserStatus.Active.code, deleted = false, salt, encodedPassword, userRole.code)
+
+    executeSave(Users += newUser)
+  }
+
+}
+
+object AuthService {
+  //1 hour
+  private val DefaultExpireSeconds = 60 * 60
+  //two weeks
+  private val DefaultRememberMeSeconds = 14 * 24 * 60 * 60
+
+  import models.Tables.profile.api._
+
+  private val UserByEmailQuery = Compiled { (email: Rep[String]) =>
+    for {u <- Users if u.email.toLowerCase === email.toLowerCase} yield u
+  }
+
+  case class AuthInfo(uuid: UserID, email: String, firstName: String, lastName: String, role: UserRole)
+
+  case class AuthToken(key: String, authInfo: AuthInfo) extends RedisObject
+
+  implicit val userIdFormat: Format[UserID] = models.JsonFormats.taggedTypeFormat[UUID, UserIDTag]
+  implicit val userRoleFormat: Format[UserRole] = Format(UserRole.jsonReads, UserRole.jsonWrites)
+  implicit val authInfoFormat: Format[AuthInfo] = Json.format[AuthInfo]
+  implicit val tokenFormat: Format[AuthToken] = Json.format[AuthToken]
+
+}

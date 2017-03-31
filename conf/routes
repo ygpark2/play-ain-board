@@ -1,0 +1,73 @@
+
+# Public urls
+GET         /                                 controllers.Application.index()
+GET         /loginForm                        controllers.Application.loginForm()
+GET         /jwt.html                         controllers.Application.jwt()
+
+# URLs protected via Controller
+GET         /facebook/index.html              controllers.Application.facebookIndex()
+GET         /facebookadmin/index.html         controllers.Application.facebookAdminIndex()
+GET         /facebookcustom/index.html        controllers.Application.facebookCustomIndex()
+GET         /twitter/index.html               controllers.Application.twitterIndex()
+GET         /form/index.html                  controllers.Application.formIndex()
+GET         /form/index.html.json             controllers.Application.formIndexJson()
+GET         /basicauth/index.html             controllers.Application.basicauthIndex()
+GET         /protected/index.html             controllers.Application.protectedIndex()
+GET         /protected/custom.html            controllers.Application.protectedCustomIndex()
+GET         /dba/index.html                   controllers.Application.dbaIndex()
+POST        /dba/index.html                   controllers.Application.dbaIndex()
+GET         /rest-jwt/index.html              controllers.Application.restJwtIndex()
+POST        /csrf/index.html                  controllers.Application.csrfIndex()
+
+# URLs protected via Filter
+GET         /filter/facebook/index.html              controllers.ApplicationWithFilter.facebookIndex()
+GET         /filter/facebookadmin/index.html         controllers.ApplicationWithFilter.facebookAdminIndex()
+GET         /filter/facebookcustom/index.html        controllers.ApplicationWithFilter.facebookCustomIndex()
+GET         /filter/twitter/index.html               controllers.ApplicationWithFilter.twitterIndex()
+GET         /filter/form/index.html                  controllers.ApplicationWithFilter.formIndex()
+GET         /filter/form/index.html.json             controllers.ApplicationWithFilter.formIndexJson()
+GET         /filter/basicauth/index.html             controllers.ApplicationWithFilter.basicauthIndex()
+GET         /filter/protected/index.html             controllers.ApplicationWithFilter.protectedIndex()
+GET         /filter/protected/custom.html            controllers.ApplicationWithFilter.protectedCustomIndex()
+GET         /filter/dba/index.html                   controllers.ApplicationWithFilter.dbaIndex()
+POST        /filter/dba/index.html                   controllers.ApplicationWithFilter.dbaIndex()
+GET         /filter/rest-jwt/index.html              controllers.ApplicationWithFilter.restJwtIndex()
+
+
+# Routes necessary for play-pac4j
+GET         /forceLogin                       controllers.Application.forceLogin()
+GET         /callback                         @org.pac4j.play.CallbackController.callback()
+POST        /callback                         @org.pac4j.play.CallbackController.callback()
+GET         /logout                           @org.pac4j.play.LogoutController.logout()
+# GET         /centralLogout                    controllers.CentralLogoutController.logout()
+
+GET         /signup                     controllers.Authentication.signup()
+POST        /signup                     controllers.Authentication.handleSignUp()
+GET		    /signup/:token				controllers.Authentication.verifySignUp(token: String)
+
+# GET		/login						controllers.Authentication.prepareLogin()
+# POST	/login						controllers.Authentication.login()
+# GET		/logout						controllers.Authentication.logout()
+# GET     /signup                     controllers.Authentication.signup()
+# POST    /signup                     controllers.Authentication.handleSignUp()
+# GET		/signup/:token				controllers.Authentication.verifySignUp(token: String)
+# GET		/reset-password				controllers.Authentication.forgotPassword()
+# POST	/reset-password				controllers.Authentication.handleForgotPassword()
+# GET		/reset-password/:token	    controllers.Authentication.resetPassword(token: String)
+# POST	/reset-password/:token	    controllers.Authentication.handleResetPassword(token: String)
+
+# GET		/messages  					controllers.RestrictedApplication.messages()
+# POST    /messages/add               controllers.RestrictedApplication.addMessage()
+# POST    /messages/:id/delete        controllers.RestrictedApplication.deleteMessage(id:Int)
+
+# GET     /                                    controllers.Application.listProjects
+# PUT     /projects/:name                      controllers.Application.createProject(name: String)
+# GET     /projects/list                       controllers.Application.listProjects
+# GET     /projects/:id                        controllers.Application.projects(id: Long)
+# PUT     /projects/:id/:name                  controllers.Application.addTaskToProject(name: String, id: Long)
+# PATCH   /tasks/:id                           controllers.Application.modifyTask(id: Long, color:Option[String] ?= None)
+
+# DELETE  /projects/:name                      controllers.Application.delete(name: String)
+
+GET     /favicon.ico                        controllers.Assets.at(path="/public", file="favicon.ico")
+GET     /assets/*file                       controllers.Assets.at(path="/public", file)

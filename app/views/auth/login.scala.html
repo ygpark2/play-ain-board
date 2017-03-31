@@ -1,0 +1,40 @@
+@(loginForm: Form[forms.LoginFormData], loginUrl: String)(implicit messages: Messages)
+
+@_template(None) {
+<div>
+    <div class="row">
+        <div class="medium-4 medium-centered columns">
+            <h3 class="text-center">@messages("signin")</h3>
+        </div>
+    </div>
+    <form method="post" action="@loginUrl">
+        <div class="row">
+            <div class="medium-4 medium-centered columns">
+                <label>Email
+                    <input type="email" placeholder="write@@your.email" name="username" value="@loginForm("email").value" required />
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="medium-4 medium-centered columns">
+                <label>Password
+                    <input type="password" placeholder="password" name="password" value="@loginForm("password").value" required />
+                    @loginForm.globalError.map { formError =>
+                    <span class="form-error is-visible">@formError.message</span>
+                    }
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="medium-4 medium-centered columns">
+                <button type="submit" class="button expanded">Login</button>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="medium-4 medium-centered columns">
+            <p>@Messages("signin.forgot.question") <a href="routes.Authentication.forgotPassword">@Messages("signin.forgot")</a></p>
+        </div>
+    </div>
+</div>
+}

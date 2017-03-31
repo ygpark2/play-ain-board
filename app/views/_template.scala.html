@@ -1,0 +1,64 @@
+@(account: Option[User], scripts: Html = Html(""))(content: Html)(implicit messages: Messages)
+
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autobot</title>
+    <link href="@routes.Assets.at("img/favicon.png")" rel="shortcut icon">
+    <link rel='stylesheet' href="@routes.Assets.at("public/templatesite.css")">
+    <link rel='stylesheet' href="@routes.Assets.at("css/templatesite.css")">
+
+    <script type="text/javascript" src="routes.Application.javascriptRoutes"></script>
+    <script type='text/javascript' src='@routes.Assets.at("public/jquery.js")'></script>
+    <script type='text/javascript' src='@routes.Assets.at("public/templatesite.css")'></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    @scripts
+</head>
+<body>
+<div id="header" class="top-bar">
+    <div class="row">
+        <div class="top-bar-left">
+            <ul class="dropdown menu" data-dropdown-menu>
+                @if(account.isDefined) {
+                <li class="menu-text"><a href="#">Markets</a></li>
+                <li class="menu-text"><a href="#">History</a></li>
+                }
+            </ul>
+        </div>
+        <div class="top-bar-right">
+            <ul class="menu">
+                @if(account.isEmpty) {
+                <li><a href="#" class="button hollow">Login</a></li>
+                <li><a href="#" class="button hollow">Sign Up</a></li>
+                } else {
+                <li><a href="#" title="Edit Your Account">Hello <strong>  <!-- account.get.data.name --> </strong>!</a></li>
+                <li><a href="#" title="Manage messages">Messages</a></li>
+                @if(account.get.isAdmin) {
+                <!-- if(account.get.data.isAdmin) -->
+                <li><a href="#" title="Add an Account">Add Account</a></li>
+                }
+                <li><a href="routes.Authentication.logout()" class="button hollow">Logout</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+<div id="main-content" class="row column">
+    <!-- <CONTENT> -->
+    @content
+    <!-- </CONTENT> -->
+</div>
+<div id="footer" class="bottom-toolbar">
+    <div class="row column">
+        <ul class="menu">
+            <li><a href="https://github.com/asciiu/template-site">Template Site at GitHub</a></li>
+        </ul>
+    </div>
+</div>
+<script>$(document).foundation()</script>
+</body>
+</html>

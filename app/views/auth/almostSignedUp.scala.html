@@ -1,0 +1,7 @@
+
+@(user: forms.UserFormData)(implicit messages: Messages)
+
+@_template(None) {
+    <p>@Messages("signup.thanks", user.name)</p>
+    <p>@Messages("signup.sent", user.email)</p>
+}
