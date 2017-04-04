@@ -58,7 +58,7 @@ class SecurityModule(environment: Environment, configuration: Configuration) ext
     // HTTP
     // val ainAuthenticator: AinAuthenticator = environment.classLoader.asInstanceOf[Class[AinAuthenticator]].cast()
     // environment.classLoader.loadClass("AinAuthenticator")
-    val formClient = new FormClient(baseUrl + "/loginForm", new AinAuthenticator(), new UsersProfileCreator())
+    val formClient = new FormClient(baseUrl + "/loginForm", new AinAuthenticator())
     val indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator())
 
     /*

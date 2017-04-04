@@ -11,16 +11,10 @@ import org.pac4j.core.exception.{AccountNotFoundException, BadCredentialsExcepti
 import org.pac4j.core.util.CommonHelper
 import org.pac4j.core.credentials.password.PasswordEncoder
 import org.pac4j.sql.profile.DbProfile
-import play.Application
-import play.api.Play
-import play.api.db.slick.DatabaseConfigProvider
-import slick.driver.JdbcProfile
 
-import org.pac4j.core.context.Pac4jConstants
-import org.pac4j.core.profile.CommonProfile
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 class AinAuthenticator extends Authenticator[UsernamePasswordCredentials] {
 
@@ -44,8 +38,23 @@ class AinAuthenticator extends Authenticator[UsernamePasswordCredentials] {
     // ...
 
     val username = creds.getUsername
-    val user = users.findByEmail(creds.getUsername)
+    Await.result(users.findByEmail(creds.getUsername), Duration("10s")) match {
+      case Some(user) =>
+        val encodedPassword = user.password
+        val returnedPassword = creds.getPassword
+        println("expectedPassword : " + encodedPassword + " returnedPassword : " + returnedPassword)
+        if (passwordEncoder.matches(creds.getPassword, user.password)) {
+          val profile = createProfile(username, user)
+          creds.setUserProfile(profile)
+          println("------- setUserProfile -------------")
+        }
+        else
+          throw new BadCredentialsException("Bad credentials for: " + username)
+      case None => throw new AccountNotFoundException("No account found for: " + username)
 
+    }
+
+    /*
     user.onSuccess {
       case Some(user) => {
         val encodedPassword = user.password
@@ -65,27 +74,24 @@ class AinAuthenticator extends Authenticator[UsernamePasswordCredentials] {
       }
     }
     user.onFailure { case f => throw new TechnicalException("Cannot fetch username / password from DB", f) }
+    */
   }
 
-  protected def createProfile(username: String, user: User): CommonProfile = {
+  protected def createProfile(username: String, user: User): DbProfile = {
 
-    val profile = new CommonProfile
-    profile.setId(user.id)
-    profile.addAttribute(Pac4jConstants.USERNAME, username)
+    println("=============== creating profile ==================")
 
-    /*
     val profile = new DbProfile
-    profile.setId(username)
+    profile.setId(user.id)
 
     profile.addAttribute("name", user.name)
-    // profile.addAttribute("name", user)
+    profile.addAttribute("email", user.email)
     /*
     for (attribute <- attributes) {
       profile.addAttribute(attribute, user..get(attribute)
     }
     */
     profile.addRole("ROLE_ADMIN")
-    */
     profile
   }
 }
