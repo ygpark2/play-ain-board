@@ -1,4 +1,4 @@
-@(loginForm: Form[forms.UserFormData])(implicit messages: Messages)
+@(signupForm: Form[forms.SignupFormData])(implicit messages: Messages)
 @_template(None) {
 <div class="row">
     <div class="medium-4 medium-centered columns">
@@ -9,8 +9,8 @@
     <div class="row">
         <div class="medium-4 medium-centered columns">
             <label>Name
-                <input type="text" placeholder="name" name="name" value="@loginForm("name").value" required/>
-                @loginForm.error("name").map { formError =>
+                <input type="text" placeholder="name" name="name" value="@signupForm("name").value" required/>
+                @signupForm.error("name").map { formError =>
                 <span class="form-error is-visible">@formError.message</span>
                 }
             </label>
@@ -19,8 +19,8 @@
     <div class="row">
         <div class="medium-4 medium-centered columns">
             <label>Email
-                <input type="email" placeholder="write@@your.email" name="email" value="@loginForm("email").value" required/>
-                @loginForm.error("email").map { formError =>
+                <input type="email" placeholder="write@@your.email" name="email" value="@signupForm("email").value" required/>
+                @signupForm.error("email").map { formError =>
                 <span class="form-error is-visible">@formError.message</span>
                 }
             </label>
@@ -29,8 +29,8 @@
     <div class="row">
         <div class="medium-4 medium-centered columns">
             <label>Password
-                <input type="password" placeholder="password" name="password" value="@loginForm("password").value" required />
-                @loginForm.error("password").map { formError =>
+                <input type="password" placeholder="password" name="password" value="@signupForm("password").value" required />
+                @signupForm.error("password").map { formError =>
                 <span class="form-error is-visible">@formError.message</span>
                 }
             </label>
@@ -39,8 +39,8 @@
     <div class="row">
         <div class="medium-4 medium-centered columns">
             <label>Confirm Password
-                <input type="password" placeholder="password" name="passwordAgain" value="@loginForm("passwordAgain").value" required />
-                @loginForm.error("passwordAgain").map { formError =>
+                <input type="password" placeholder="password" name="passwordAgain" value="@signupForm("passwordAgain").value" required />
+                @signupForm.error("passwordAgain").map { formError =>
                 <span class="form-error is-visible">@formError.message</span>
                 }
             </label>

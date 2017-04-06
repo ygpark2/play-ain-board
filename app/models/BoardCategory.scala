@@ -11,17 +11,18 @@ import slick.jdbc.meta.MTable.getTables
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class Board(id: UUID, name: String, mobile_name: String, order: Int, search_flag: Boolean) extends HasId {
+case class BoardCategory(id: UUID,
+                         board_id: Board,
+                         name: String,
+                         parentId: UUID) extends HasId {
 
-  def patch(name: Option[String], mobile_name: Option[String], order: Option[Int], search_flag: Option[Boolean]): Board =
+  def patch(name: Option[String], parentId: Option[UUID]): BoardCategory =
     this.copy(name = name.getOrElse(this.name),
-      mobile_name = mobile_name.getOrElse(this.mobile_name),
-      order = order.getOrElse(this.order),
-      search_flag = search_flag.getOrElse(this.search_flag))
+      parentId = parentId.getOrElse(this.parentId))
 
 }
 
-class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[Board] {
+class BoardCategories @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[BoardCategory] {
 
   /*
   val dbConfig = dbConfigProvider.get[JdbcProfile]
@@ -35,22 +36,19 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
 
   import driver.api._
 
-  override type SpecificTable = BoardsTable
+  override type SpecificTable = BoardCategoriesTable
   override protected val query = TableQuery[SpecificTable]
 
-  override protected val TableName = "BOARDS"
+  override protected val TableName = "BOARD_CATEGORIES"
 
-  def findByName(name: String): Future[List[Board]] =
-    db.run(query.filter(_.name like name).to[List].result)
+  def findByParentId(parenttId: UUID): Future[List[BoardCategory]] =
+    db.run(query.filter(_.parentId === parenttId).to[List].result)
 
-  def findByMobileName(mobileName: String): Future[List[Board]] =
-    db.run(query.filter(_.mobile_name like mobileName).to[List].result)
-
-  def partialUpdate(id: UUID, name: Option[String], mobile_name: Option[String], order: Option[Int], search_flag: Option[Boolean]): Future[Int] = {
+  def partialUpdate(id: UUID, name: Option[String], parentId: Option[UUID]): Future[Int] = {
     val queryFilter = query.filter(_.id === id)
 
     val update = queryFilter.result.head.flatMap {task =>
-      query.update(task.patch(name, mobile_name, order, search_flag))
+      query.update(task.patch(name, parentId))
     }
 
     db.run(update)
@@ -77,25 +75,40 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
   }
    */
 
-  def all(): Future[Seq[Board]] =
+  def all(): Future[Seq[BoardCategory]] =
     db.run(query.result)
 
-  /*
-  def _deleteAllInProject(projectId: Long): Future[Int] =
-    db.run(query.filter(_.project === projectId).delete)
-  */
+  def _deleteAllInParentt(parenttId: UUID): Future[Int] =
+    db.run(query.filter(_.parentId === parenttId).delete)
 
-  protected class BoardsTable(tag: Tag) extends AbstractTable(tag, "BOARD") {
+  def findChildrenWithParents() = {
+    val result = db.run((for {
+      c <- query
+      s <- c.subcategories
+    } yield (c,s)).sortBy(_._1.name).result)
 
+    result map {
+      case categoryTuples => categoryTuples.groupBy(_._1).map{
+        case (k,v) => (k,v.map(_._2))
+      }
+    }
+
+  }
+
+  protected class BoardCategoriesTable(tag: Tag) extends AbstractTable(tag, "BOARD_CATEGORIES") {
+
+    def board = column[UUID]("BOARD_ID")
     def name = column[String]("NAME")
-    def mobile_name = column[String]("MOBILE_NAME")
-    def order = column[Int]("ORDER")
-    def search_flag = column[Boolean]("SEARCH_FLAG")
+    def parentId = column[UUID]("PARENT")
 
-    def * = (id, name, mobile_name, order, search_flag) <> (Board.tupled, Board.unapply)
+    // def * = (id, color, status, project) <> (Board.tupled, Board.unapply)
 
     // def ? = (id.?, color.?, status, project.?).shaped.<>({ r => import r._; _1.map(_ => Task.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
+    def * = (id, name, parentId) <> (BoardCategory.tupled, BoardCategory.unapply)
+    def boardFK = foreignKey("board_fk", board, query)(_.id)
+    def categoryFK = foreignKey("category_fk", parentId, query)(_.id)
+    def subcategories = TableQuery[BoardCategoriesTable].filter(_.id === parentId)
   }
 
   override protected val testData = List()

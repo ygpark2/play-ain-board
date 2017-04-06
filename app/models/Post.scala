@@ -1,5 +1,6 @@
 package models
 
+import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
 
@@ -11,7 +12,49 @@ import slick.jdbc.meta.MTable.getTables
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class Post(id: UUID, color: String, status: PostStatus, board: UUID) extends HasId {
+case class PostUser(
+                userid: String,
+                username: String,
+                nickname: String,
+                email: String,
+                homepage: String
+                   )
+
+case class PostConf(
+                     enable_secret: Boolean,
+                     enable_html: Boolean,
+                     enable_hide_comment: Boolean,
+                     enable_notice: Boolean,
+                     enable_receive_email: Boolean
+                   )
+
+case class PostInfo(
+                     link_count: Int,
+                     hit: Int,
+                     like: Int,
+                     dislike: Int,
+                     ip_address: String,
+                     blame_count: Int,
+                     device: String,
+                     attached_file_count: Int,
+                     attached_image_count: Int,
+                   )
+
+case class Post(id: UUID,
+                board_id: Board,
+                category: BoardCategory,
+                title: String,
+                content: String,
+                password: String,
+                created_datetime: Timestamp,
+                updated_datetime: Timestamp,
+                updated_userid: String,
+                comment_count: Int,
+                comment_updated_datetime: Timestamp,
+                postUser: PostUser,
+                postConf: PostConf,
+                postInfo: PostInfo,
+                deleted: Boolean) extends HasId {
 
   def patch(color: Option[String], status: Option[PostStatus], board: Option[UUID]): Post =
     this.copy(color = color.getOrElse(this.color),

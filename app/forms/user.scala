@@ -14,7 +14,10 @@ import services.DBService
 
 case class LoginFormData(email: String, password: String)
 
-case class UserFormData(name:String, email: String, password: String, passwordAgain:String)
+case class SignupFormData(name:String, email: String, password: String, passwordAgain:String,
+                          phone: String, mobile: String, sex: String, zipcode: Int, address1: String,
+                          address2: String, introduction: String
+                         )
 
 // @Singleton
 class UserForms @Inject()(val users: Users) {
@@ -43,12 +46,19 @@ class UserForms @Inject()(val users: Users) {
       "name" -> nonEmptyText,
       "email" -> email.verifying(maxLength(250), uniqueEmail),
       "password" -> passwordMapping,
-      "passwordAgain" -> passwordMapping
-    )(UserFormData.apply)(UserFormData.unapply)
+      "passwordAgain" -> passwordMapping,
+      "phone" -> text,
+      "mobile" -> text,
+      "sex" -> text,
+      "zipcode" -> number,
+      "address1" -> text,
+      "address2" -> text,
+      "introduction" -> text
+    )(SignupFormData.apply)(SignupFormData.unapply)
   )
 
   val updateAccount = userForm(text)
 
-  val addAccount = userForm(nonEmptyText)
+  val registerAccount = userForm(nonEmptyText)
 
 }

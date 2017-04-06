@@ -1,6 +1,6 @@
 package controllers
 
-import java.time.OffsetDateTime
+import java.time.{LocalDateTime, OffsetDateTime}
 import java.util.UUID
 import javax.inject.Inject
 
@@ -25,16 +25,14 @@ import org.pac4j.play.store.PlaySessionStore
 
 import scala.collection.JavaConversions._
 import forms.UserForms
-import models.{NormalRole, User, Users}
+import models._
 import models.account.MailTokenUser
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import services.{MailService, MailTokenUserService}
 import utils.Mailer
 
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.duration.Duration
 import com.github.t3hnar.bcrypt._
 
@@ -59,7 +57,7 @@ class Authentication @Inject() (val config: Config,
     * Starts the sign up mechanism. It shows a form that the user have to fill in and submit.
     */
   def signup() = Action.async { implicit request =>
-    Future( Ok(views.html.auth.signup(userForms.addAccount)) )
+    Future( Ok(views.html.auth.signup(userForms.registerAccount)) )
   }
 
   /**
@@ -68,33 +66,38 @@ class Authentication @Inject() (val config: Config,
     */
   def handleSignUp() = Action.async { implicit request =>
     logger.debug("handle signup================> ")
-    userForms.addAccount.bindFromRequest.fold(
+    userForms.registerAccount.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(views.html.auth.signup(formWithErrors))),
-      userFormData => {
-        if(userFormData.password.nonEmpty && userFormData.password == userFormData.passwordAgain) {
+      signupFormData => {
+        if(signupFormData.password.nonEmpty && signupFormData.password == signupFormData.passwordAgain) {
           println("--------------- password matched -------------------------------")
           val salt = generateSalt
+          val userInfo = UserInfo(signupFormData.phone, signupFormData.mobile, signupFormData.sex, signupFormData.zipcode.toString, signupFormData.address1, signupFormData.address2, "", "", signupFormData.introduction)
+          val userConf = UserConf(1, 1, 1, 1, java.sql.Timestamp.valueOf(LocalDateTime.now()), "255.141.38.200", java.sql.Timestamp.valueOf(LocalDateTime.now()), "232.133.48.102")
+          val user = User(UUID.randomUUID(), Common(), signupFormData.name, signupFormData.email, false, signupFormData.password.bcrypt(salt), salt, 2, 283, userInfo, userConf, NormalRole)
           for {
-            id <- userForms.users.add(UUID.randomUUID(), userFormData.name, userFormData.email, false, userFormData.password.bcrypt(salt), salt, NormalRole)
-            token <- tokenService.create(MailTokenUser(userFormData.email, isSignUp = true))
-            user <- userForms.users.find(id)
+            id <- userForms.users.insert(user)
+            token <- tokenService.create(MailTokenUser(signupFormData.email, isSignUp = true))
           } yield {
             println("created id => " + id)
             println("created token => " + token)
-            user match {
-              case Some(u) => {
-                Mailer.welcome(u, link = routes.Authentication.verifySignUp(token.get.id).absoluteURL())
-                Ok(views.html.auth.almostSignedUp(userFormData))
+            if (id > 0) {
+              token match {
+                case Some(t) => {
+                  Mailer.welcome(user, link = routes.Authentication.verifySignUp(t.id).absoluteURL())
+                  Ok(views.html.auth.almostSignedUp(signupFormData))
+                }
+                case None => {
+                  None
+                  Ok(views.html.auth.almostSignedUp(signupFormData))
+                }
               }
-              case None => {
-                None
-                Ok(views.html.auth.almostSignedUp(userFormData))
-              }
+            } else {
+              Ok(views.html.auth.almostSignedUp(signupFormData))
             }
           }
-
         } else {
-          val form = userForms.addAccount.fill(userFormData).withError("passwordAgain", "Passwords don't match")
+          val form = userForms.registerAccount.fill(signupFormData).withError("passwordAgain", "Passwords don't match")
           Future.successful(BadRequest(views.html.auth.signup(form)))
         }
       }
@@ -113,8 +116,7 @@ class Authentication @Inject() (val config: Config,
           user <- userForms.users.findByEmail(token.email)
         } yield {
           user.map(u => {
-            u.emailConfirmed = true
-            userForms.users.update(u)
+            userForms.users.update(u.withEmailConfirmed(true))
           })
           Ok("verified!!!!!!!!!!!")
         }
