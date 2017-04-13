@@ -44,7 +44,12 @@ class Application @Inject() (val config: Config,
       val webContext = new PlayWebContext(request, playSessionStore)
       val sessionId = webContext.getSessionIdentifier()
       val csrfToken = webContext.getSessionAttribute(Pac4jConstants.CSRF_TOKEN).asInstanceOf[String]
-      Ok(views.html.index(profiles, csrfToken, sessionId))
+
+      if(profiles.head.getTypedId().equals("anonymous")) {
+          println("AnonymousProfile =============================")
+        }
+
+      Ok(views.html.index(Some(profiles), csrfToken, sessionId))
     }
   }
 

@@ -1,4 +1,4 @@
-@(currentPage: Page[(models.Board, models.Post)], currentOrderBy: Int, currentFilter: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], currentPage: Page[(models.Board, models.Post)], currentOrderBy: Int, currentFilter: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @****************************************
 * Helper generating navigation links    *
@@ -18,8 +18,8 @@
 </th>
 }
 
-@_template(None) {
-<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 830px;">
+@_template(profiles) {
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 1030px;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">
 
         @Option(currentPage.items).filterNot(_.isEmpty).map { items =>
@@ -69,29 +69,22 @@
             </div>
         </div>
         <div class="mdl-card__actions">
-            <div id="pagination" class="pagination">
+            <div class="paginate wrapper" style="padding: 0em;">
                 <ul>
                     @currentPage.prev.map { page =>
-                    <li class="prev">
-                        <a href="@link(items.head._1.key, page)">&larr; Previous</a>
-                    </li>
+                    <li> <a href="@link(items.head._1.key, page)">&larr; Previous</a> </li>
                     }.getOrElse {
-                    <li class="prev disabled">
-                        <a>&larr; Previous</a>
-                    </li>
+                    <li class="inactive"> <a>&larr; Previous</a> </li>
                     }
                     @for( page <- 1 to currentPage.totalPage ){
                         <li> <a href="@link(items.head._1.key, page - 1)">@page</a> </li>
                     }
-                    <li class="current">
-                        <a>Displaying @(currentPage.offset + 1) to @(currentPage.offset + items.size) of @currentPage.total</a>
-                    </li>
                     @currentPage.next.map { page =>
                     <li class="next">
                         <a href="@link(items.head._1.key, page)">Next &rarr;</a>
                     </li>
                     }.getOrElse {
-                    <li class="next disabled">
+                    <li class="inactive">
                         <a>Next &rarr;</a>
                     </li>
                     }

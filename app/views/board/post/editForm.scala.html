@@ -1,6 +1,6 @@
-@(newPostForm: Form[forms.NewPostFormData], board: models.Board, post: models.Post)(implicit messages: Messages, webJarAssets: WebJarAssets)
-@_template(None) {
-<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 830px;">
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], newPostForm: Form[forms.NewPostFormData], board: models.Board, post: models.Post)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@_template(profiles) {
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 1030px;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">
         <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
             <div class="mdl-grid">

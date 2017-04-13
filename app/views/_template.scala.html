@@ -1,4 +1,4 @@
-@(account: Option[User], scripts: Html = Html(""))(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], scripts: Html = Html(""))(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 <!doctype html>
 <html class="no-js" lang="en" dir="ltr">
@@ -29,7 +29,7 @@
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
             <!-- Title -->
-            <span class="mdl-layout-title">Title</span>
+            <span class="mdl-layout-title"><a href="/">Title</a></span>
             <!-- Add spacer, to align navigation to the right -->
             <div class="mdl-layout-spacer"></div>
             <!-- Navigation. We hide it in small screens. -->
@@ -47,7 +47,7 @@
                 <li><a href="http://www.g.com">Contact</a></li>
             </ul>
             <nav class="mdl-navigation mdl-layout--large-screen-only">
-                @if(account.isDefined) {
+                @if(profiles.isDefined && profiles.head.isInstanceOf[org.pac4j.core.profile.CommonProfile]) {
                 <a class="mdl-navigation__link" href="#">Markets</a>
                 <a class="mdl-navigation__link" href="#">History</a>
                 }
@@ -57,17 +57,17 @@
                 <a class="mdl-navigation__link" href="@routes.Post.listPost("notice")">공지사항</a>
                 <a class="mdl-navigation__link" href="@routes.Post.listPost("free")">자유게시판</a>
 
-                @if(account.isEmpty) {
+                @if(profiles.isEmpty || (!profiles.isEmpty && profiles.get.head.isInstanceOf[org.pac4j.core.profile.AnonymousProfile])) {
                     <a class="mdl-navigation__link" href="/login" class="button hollow">Login</a>
                     <a class="mdl-navigation__link" href="/signup" class="button hollow">Sign Up</a>
                 } else {
                     <a class="mdl-navigation__link" href="#" title="Edit Your Account">Hello <strong> <!-- account.get.data.name --> </strong>!</a>
                     <a class="mdl-navigation__link" href="#" title="Manage messages">Messages</a>
-                    @if(account.get.isAdmin) {
-                        <!-- if(account.get.data.isAdmin) -->
-                        <a class="mdl-navigation__link" href="#" title="Add an Account">Add Account</a>
-                    }
-                    <a class="mdl-navigation__link" href="routes.Authentication.logout()" class="button hollow">Logout</a>
+                    <!-- if(account.get.isAdmin) { -->
+                    <!-- if(account.get.data.isAdmin) -->
+                    <a class="mdl-navigation__link" href="#" title="Add an Account">Add Account</a>
+                    <!-- } -->
+                    <a class="mdl-navigation__link" href="/logout" class="button hollow">Logout</a>
                 }
             </nav>
         </div>

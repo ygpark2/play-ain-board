@@ -38,7 +38,7 @@ class ApplicationWithFilter @Inject() (val config: Config,
       val webContext = new PlayWebContext(request, playSessionStore)
       val csrfToken = webContext.getSessionAttribute(Pac4jConstants.CSRF_TOKEN).asInstanceOf[String]
       // val messages = messagesApi.preferred(request)
-      Ok(views.html.index(profiles, csrfToken, null))
+      Ok(views.html.index(Some(profiles), csrfToken, null))
     }
   }
 

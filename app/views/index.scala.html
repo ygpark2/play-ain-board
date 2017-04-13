@@ -1,6 +1,6 @@
-@(profiles: List[org.pac4j.core.profile.CommonProfile], csrfToken: String, sessionId: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], csrfToken: String, sessionId: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
-@_template(None) {
+@_template(profiles) {
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 80%;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">
         <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
