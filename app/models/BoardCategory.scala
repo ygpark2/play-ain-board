@@ -12,27 +12,20 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class BoardCategory(id: UUID,
-                         board_id: Board,
+                         board: UUID,
                          name: String,
-                         parentId: UUID) extends HasId {
+                         parentId: Option[UUID]) extends HasId {
 
-  def patch(name: Option[String], parentId: Option[UUID]): BoardCategory =
-    this.copy(name = name.getOrElse(this.name),
-      parentId = parentId.getOrElse(this.parentId))
+  def patch(board: Option[UUID], name: Option[String], parentId: Option[UUID]): BoardCategory =
+    this.copy(
+      board = board.getOrElse(this.board),
+      name = name.getOrElse(this.name),
+      parentId = parentId // .getOrElse(this.parentId)
+    )
 
 }
 
 class BoardCategories @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[BoardCategory] {
-
-  /*
-  val dbConfig = dbConfigProvider.get[JdbcProfile]
-  // val dbConfig = dbConfigProvider.get[JdbcProfile]
-
-  val db = dbConfig.db
-
-  import dbConfig.driver.api._
-  private val Tasks = TableQuery[TasksTable]
-  */
 
   import driver.api._
 
@@ -44,11 +37,11 @@ class BoardCategories @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   def findByParentId(parenttId: UUID): Future[List[BoardCategory]] =
     db.run(query.filter(_.parentId === parenttId).to[List].result)
 
-  def partialUpdate(id: UUID, name: Option[String], parentId: Option[UUID]): Future[Int] = {
+  def partialUpdate(id: UUID, board: Option[UUID], name: Option[String], parentId: Option[UUID]): Future[Int] = {
     val queryFilter = query.filter(_.id === id)
 
     val update = queryFilter.result.head.flatMap {task =>
-      query.update(task.patch(name, parentId))
+      query.update(task.patch(board, name, parentId))
     }
 
     db.run(update)
@@ -78,8 +71,8 @@ class BoardCategories @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   def all(): Future[Seq[BoardCategory]] =
     db.run(query.result)
 
-  def _deleteAllInParentt(parenttId: UUID): Future[Int] =
-    db.run(query.filter(_.parentId === parenttId).delete)
+  def _deleteAllInParent(parentId: UUID): Future[Int] =
+    db.run(query.filter(_.parentId === parentId).delete)
 
   def findChildrenWithParents() = {
     val result = db.run((for {
@@ -97,20 +90,29 @@ class BoardCategories @Inject()(protected val dbConfigProvider: DatabaseConfigPr
 
   protected class BoardCategoriesTable(tag: Tag) extends AbstractTable(tag, "BOARD_CATEGORIES") {
 
-    def board = column[UUID]("BOARD_ID")
-    def name = column[String]("NAME")
-    def parentId = column[UUID]("PARENT")
+    val boards: Boards = new Boards(dbConfigProvider)
 
-    // def * = (id, color, status, project) <> (Board.tupled, Board.unapply)
+    def boardId = column[UUID]("BOARD_ID")
+    def name = column[String]("NAME")
+    def parentId = column[Option[UUID]]("PARENT", O.Default(None))
+
+    def boardFK = foreignKey("board_fk", boardId, boards.getQuery())(_.id)
+    def categoryFK = foreignKey("category_fk", parentId, query)(_.id.?)
+    def subcategories = TableQuery[BoardCategoriesTable].filter(_.id === parentId)
 
     // def ? = (id.?, color.?, status, project.?).shaped.<>({ r => import r._; _1.map(_ => Task.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
-    def * = (id, name, parentId) <> (BoardCategory.tupled, BoardCategory.unapply)
-    def boardFK = foreignKey("board_fk", board, query)(_.id)
-    def categoryFK = foreignKey("category_fk", parentId, query)(_.id)
-    def subcategories = TableQuery[BoardCategoriesTable].filter(_.id === parentId)
+    def * = (id, boardId, name, parentId) <> (BoardCategory.tupled, BoardCategory.unapply)
+
   }
 
-  override protected val testData = List()
+  override protected val testData = List(
+    BoardCategory(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7a"), UUID.fromString("7f85f701-3cc5-4467-a802-4c436b97f0d1"), "test_category1_1", None),
+    BoardCategory(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7b"), UUID.fromString("7f85f701-3cc5-4467-a802-4c436b97f0d1"), "test_category1_2", Some(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7a"))),
+    BoardCategory(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7c"), UUID.fromString("7f85f701-3cc5-4467-a802-4c436b97f0d1"), "test_category1_3", Some(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7b"))),
+    BoardCategory(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7d"), UUID.fromString("7f85f701-3cc5-4467-a802-4c436b97f0d2"), "test_category2_1", None),
+    BoardCategory(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7e"), UUID.fromString("7f85f701-3cc5-4467-a802-4c436b97f0d2"), "test_category2_2", Some(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7d"))),
+    BoardCategory(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7f"), UUID.fromString("7f85f701-3cc5-4467-a802-4c436b97f0d2"), "test_category2_3", Some(UUID.fromString("3f909c47-a46f-45ac-9ecc-de553317cd7e")))
+  )
 
 }

@@ -12,13 +12,19 @@ import org.pac4j.jwt.profile.JwtGenerator
 import org.pac4j.play.PlayWebContext
 import org.pac4j.play.scala.Security
 import org.pac4j.play.store.PlaySessionStore
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.libs.concurrent.HttpExecutionContext
 
 import scala.collection.JavaConversions._
 
-class ApplicationWithFilter @Inject() (val config: Config, val playSessionStore: PlaySessionStore, override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] {
+class ApplicationWithFilter @Inject() (val config: Config,
+                                       val messagesApi: MessagesApi,
+                                       val playSessionStore: PlaySessionStore,
+                                       implicit val webJarAssets: WebJarAssets,
+                                       override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
 
   private def getProfiles(implicit request: RequestHeader): List[CommonProfile] = {
     val webContext = new PlayWebContext(request, playSessionStore)
@@ -31,6 +37,7 @@ class ApplicationWithFilter @Inject() (val config: Config, val playSessionStore:
     Action { request =>
       val webContext = new PlayWebContext(request, playSessionStore)
       val csrfToken = webContext.getSessionAttribute(Pac4jConstants.CSRF_TOKEN).asInstanceOf[String]
+      // val messages = messagesApi.preferred(request)
       Ok(views.html.index(profiles, csrfToken, null))
     }
   }

@@ -37,13 +37,14 @@ import scala.concurrent.duration.Duration
 import com.github.t3hnar.bcrypt._
 
 class Authentication @Inject() (val config: Config,
-                             val messagesApi: MessagesApi,
-                             val mailService: MailService,
-                             val userForms: UserForms,
-                             val playSessionStore: PlaySessionStore,
-                             override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
+                                val messagesApi: MessagesApi,
+                                implicit val mailService: MailService,
+                                val userForms: UserForms,
+                                val playSessionStore: PlaySessionStore,
+                                implicit val webJarAssets: WebJarAssets,
+                                override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
 
-  implicit val ms = mailService
+  // implicit val ms = mailService
   val tokenService = new MailTokenUserService()
 
   private def getProfiles(implicit request: RequestHeader): List[CommonProfile] = {
@@ -72,9 +73,12 @@ class Authentication @Inject() (val config: Config,
         if(signupFormData.password.nonEmpty && signupFormData.password == signupFormData.passwordAgain) {
           println("--------------- password matched -------------------------------")
           val salt = generateSalt
+          /*
           val userInfo = UserInfo(signupFormData.phone, signupFormData.mobile, signupFormData.sex, signupFormData.zipcode.toString, signupFormData.address1, signupFormData.address2, "", "", signupFormData.introduction)
           val userConf = UserConf(1, 1, 1, 1, java.sql.Timestamp.valueOf(LocalDateTime.now()), "255.141.38.200", java.sql.Timestamp.valueOf(LocalDateTime.now()), "232.133.48.102")
           val user = User(UUID.randomUUID(), Common(), signupFormData.name, signupFormData.email, false, signupFormData.password.bcrypt(salt), salt, 2, 283, userInfo, userConf, NormalRole)
+          */
+          val user = User(UUID.randomUUID(), Common(), signupFormData.name, signupFormData.email, false, signupFormData.password.bcrypt(salt), salt, 2, 283, NormalRole)
           for {
             id <- userForms.users.insert(user)
             token <- tokenService.create(MailTokenUser(signupFormData.email, isSignUp = true))

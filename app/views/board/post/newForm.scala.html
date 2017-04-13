@@ -1,0 +1,113 @@
+@(newPostForm: Form[forms.NewPostFormData], board: models.Board)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@_template(None) {
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 830px;">
+    <div class="mdl-card mdl-cell mdl-cell--12-col">
+        <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h3 class="mdl-cell mdl-cell--12-col">@messages("post.title")</h3>
+                </div>
+            </div>
+            <div class="section__circle-container mdl-cell">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+            <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+                <form method="post" id="newPostForm" action="@routes.Post.handleNewPost(board.key)">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--12-col">
+                            <div class="mdl-grid mdl-grid--no-spacing">
+                                <div class="mdl-cell mdl-cell--6-col">
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                        <input class="mdl-textfield__input" type="text" id="username" name="username" value="@newPostForm("username").value" required >
+                                        <label class="mdl-textfield__label" for="username">User Name</label>
+                                        @newPostForm.error("username").map { formError =>
+                                        <span class="form-error is-visible">@formError.message</span>
+                                        }
+                                    </div>
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                        <input class="mdl-textfield__input" type="text" id="homepage" name="homepage" value="@newPostForm("homepage").value" required >
+                                        <label class="mdl-textfield__label" for="homepage">Homepage</label>
+                                        @newPostForm.error("homepage").map { formError =>
+                                        <span class="form-error is-visible">@formError.message</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="mdl-cell mdl-cell--6-col">
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                        <input class="mdl-textfield__input" type="text" id="email" name="email" value="@newPostForm("email").value" required >
+                                        <label class="mdl-textfield__label" for="email">Email</label>
+                                        @newPostForm.error("email").map { formError =>
+                                        <span class="form-error is-visible">@formError.message</span>
+                                        }
+                                    </div>
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                        <input class="mdl-textfield__input" type="text" id="password" name="password" value="@newPostForm("password").value" required >
+                                        <label class="mdl-textfield__label" for="password">Password</label>
+                                        @newPostForm.error("password").map { formError =>
+                                        <span class="form-error is-visible">@formError.message</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--12-col">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
+                                <input class="mdl-textfield__input" type="text" id="title" name="title" value="@newPostForm("title").value" required >
+                                <label class="mdl-textfield__label" for="title">Title</label>
+                                @newPostForm.error("title").map { formError =>
+                                <span class="form-error is-visible">@formError.message</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--12-col">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
+                                <textarea class="mdl-textfield__input" rows= "11" id="content" name="content" required >@newPostForm("content").value</textarea>
+                                <label class="mdl-textfield__label" for="content">Content</label>
+                                @newPostForm.error("content").map { formError =>
+                                <span class="form-error is-visible">@formError.message</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--2-col">
+                            <label class="mdl-checkbox mdl-js-checkbox" for="secret">
+                                <input type="checkbox" id="secret" name="enable_secret" class="mdl-checkbox__input" value="true" @if(newPostForm("enable_secret").value.contains("true")){checked="checked"}>
+                                <span class="mdl-checkbox__label">비밀글</span>
+                            </label>
+                        </div>
+                        <div class="mdl-cell mdl-cell--2-col">
+                            <label class="mdl-checkbox mdl-js-checkbox" for="html">
+                                <input type="checkbox" id="html" name="enable_html" class="mdl-checkbox__input" value="true" @if(newPostForm("enable_html").value.contains("true")){checked="checked"}>
+                                <span class="mdl-checkbox__label">html사용</span>
+                            </label>
+                        </div>
+                        <div class="mdl-cell mdl-cell--2-col">
+                            <label class="mdl-checkbox mdl-js-checkbox" for="notice">
+                                <input type="checkbox" id="notice" name="enable_notice" class="mdl-checkbox__input" value="true" @if(newPostForm("enable_notice").value.contains("true")){checked="checked"}>
+                                <span class="mdl-checkbox__label">공지사항</span>
+                            </label>
+                        </div>
+                        <div class="mdl-cell mdl-cell--6-col"></div>
+                    </div>
+                    <div class="mdl-grid">
+                        <div class="mdl-cell mdl-cell--2-col mdl-cell--10-offset">
+                            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글쓰기</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <!--
+            <a href="#" class="mdl-button">Read our features</a>
+            -->
+        </div>
+    </div>
+</section>
+}

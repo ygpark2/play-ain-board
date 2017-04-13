@@ -1,11 +1,11 @@
-@(signupForm: Form[forms.SignupFormData])(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(signupForm: Form[forms.NewBoardFormData])(implicit messages: Messages, webJarAssets: WebJarAssets)
 @_template(None) {
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 630px;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">
         <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--12-col">
-                    <h3 class="mdl-cell mdl-cell--12-col">@messages("signup")</h3>
+                    <h3 class="mdl-cell mdl-cell--12-col">@messages("signup.title")</h3>
                 </div>
             </div>
             <div class="section__circle-container mdl-cell">
@@ -35,8 +35,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     <div class="mdl-grid mdl-grid--no-spacing">
                         <div class="mdl-cell mdl-cell--9-col mdl-cell--3-offset">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -65,19 +63,13 @@
                         </div>
                     </div>
                 </form>
-                <div class="mdl-grid mdl-grid--no-spacing">
-                    <div class="mdl-cell mdl-cell--9-col mdl-cell--3-offset">
-                        <p>@Messages("signin.forgot.question")<a href="routes.Authentication.forgotPassword">@Messages("signin.forgot")</a></p>
-                    </div>
-                </div>
-
             </div>
         </div>
-        <!--
         <div class="mdl-card__actions">
+            <!--
             <a href="#" class="mdl-button">Read our features</a>
+            -->
         </div>
-        -->
     </div>
 </section>
 }

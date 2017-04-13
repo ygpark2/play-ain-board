@@ -36,6 +36,7 @@ libraryDependencies ++= Seq(
     "commons-io" % "commons-io" % "2.5",
 
     "org.webjars" %% "webjars-play" % "2.5.0",
+    "org.webjars" % "jquery" % "2.2.4",
     "org.webjars" % "material-design-icons" % "3.0.1",
     "org.webjars" % "material-design-lite" % "1.3.0",
 

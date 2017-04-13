@@ -1,64 +1,95 @@
-@(account: Option[User], scripts: Html = Html(""))(content: Html)(implicit messages: Messages)
+@(account: Option[User], scripts: Html = Html(""))(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 <!doctype html>
 <html class="no-js" lang="en" dir="ltr">
-<head>
+
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autobot</title>
-    <link href="@routes.Assets.at("img/favicon.png")" rel="shortcut icon">
-    <link rel='stylesheet' href="@routes.Assets.at("public/templatesite.css")">
-    <link rel='stylesheet' href="@routes.Assets.at("css/templatesite.css")">
 
-    <script type="text/javascript" src="routes.Application.javascriptRoutes"></script>
-    <script type='text/javascript' src='@routes.Assets.at("public/jquery.js")'></script>
-    <script type='text/javascript' src='@routes.Assets.at("public/templatesite.css")'></script>
+    <title>Autobot</title>
+
+    <link href="@routes.Assets.at("images/favicon.png")" rel="shortcut icon"></link>
+    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")"></link>
+    <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("material.min.css"))"></link>
+
+    <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))"></script>
+    <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("material.min.js"))"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/app.js")"></script>
+
     <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
     @scripts
 </head>
-<body>
-<div id="header" class="top-bar">
-    <div class="row">
-        <div class="top-bar-left">
-            <ul class="dropdown menu" data-dropdown-menu>
+
+<body class="mdl-ain mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+
+<!-- Always shows a header, even in smaller screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <!-- Title -->
+            <span class="mdl-layout-title">Title</span>
+            <!-- Add spacer, to align navigation to the right -->
+            <div class="mdl-layout-spacer"></div>
+            <!-- Navigation. We hide it in small screens. -->
+            <ul class="nav">
+                <li><a href="http://www.g.com">Home</a></li>
+                <li><a href="http://www.g.com">Portfolio</a></li>
+                <li class="drop">Drop
+                    <ul>
+                        <li><a href="http://www.g.com">Art</a></li>
+                        <li><a href="http://www.g.com">Coding</a></li>
+                        <li><a href="http://www.g.com">Design</a></li>
+                        <li><a href="http://www.g.com">Web Development</a></li>
+                    </ul>
+                </li>
+                <li><a href="http://www.g.com">Contact</a></li>
+            </ul>
+            <nav class="mdl-navigation mdl-layout--large-screen-only">
                 @if(account.isDefined) {
-                <li class="menu-text"><a href="#">Markets</a></li>
-                <li class="menu-text"><a href="#">History</a></li>
+                <a class="mdl-navigation__link" href="#">Markets</a>
+                <a class="mdl-navigation__link" href="#">History</a>
                 }
-            </ul>
-        </div>
-        <div class="top-bar-right">
-            <ul class="menu">
+
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="@routes.Post.listPost("notice")">공지사항</a>
+                <a class="mdl-navigation__link" href="@routes.Post.listPost("free")">자유게시판</a>
+
                 @if(account.isEmpty) {
-                <li><a href="#" class="button hollow">Login</a></li>
-                <li><a href="#" class="button hollow">Sign Up</a></li>
+                    <a class="mdl-navigation__link" href="/login" class="button hollow">Login</a>
+                    <a class="mdl-navigation__link" href="/signup" class="button hollow">Sign Up</a>
                 } else {
-                <li><a href="#" title="Edit Your Account">Hello <strong>  <!-- account.get.data.name --> </strong>!</a></li>
-                <li><a href="#" title="Manage messages">Messages</a></li>
-                @if(account.get.isAdmin) {
-                <!-- if(account.get.data.isAdmin) -->
-                <li><a href="#" title="Add an Account">Add Account</a></li>
+                    <a class="mdl-navigation__link" href="#" title="Edit Your Account">Hello <strong> <!-- account.get.data.name --> </strong>!</a>
+                    <a class="mdl-navigation__link" href="#" title="Manage messages">Messages</a>
+                    @if(account.get.isAdmin) {
+                        <!-- if(account.get.data.isAdmin) -->
+                        <a class="mdl-navigation__link" href="#" title="Add an Account">Add Account</a>
+                    }
+                    <a class="mdl-navigation__link" href="routes.Authentication.logout()" class="button hollow">Logout</a>
                 }
-                <li><a href="routes.Authentication.logout()" class="button hollow">Logout</a></li>
-                }
-            </ul>
+            </nav>
         </div>
-    </div>
+    </header>
+    <main class="mdl-layout__content">
+        <div class="page-content" style="padding: 8px; padding-top: 48px; padding-bottom: 48px;">
+            <!-- Your content goes here -->
+            <!-- <CONTENT> -->
+            @content
+            <!-- </CONTENT> -->
+        </div>
+        <footer class="mdl-mini-footer">
+            <div class="mdl-mini-footer__left-section">
+                <div class="mdl-logo">Title</div>
+                <ul class="mdl-mini-footer__link-list">
+                    <li><a href="#">Help</a></li>
+                    <li><a href="#">Privacy & Terms</a></li>
+                </ul>
+            </div>
+        </footer>
+    </main>
 </div>
-<div id="main-content" class="row column">
-    <!-- <CONTENT> -->
-    @content
-    <!-- </CONTENT> -->
-</div>
-<div id="footer" class="bottom-toolbar">
-    <div class="row column">
-        <ul class="menu">
-            <li><a href="https://github.com/asciiu/template-site">Template Site at GitHub</a></li>
-        </ul>
-    </div>
-</div>
-<script>$(document).foundation()</script>
+
 </body>
 </html>

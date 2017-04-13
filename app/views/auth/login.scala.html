@@ -1,40 +1,56 @@
-@(loginForm: Form[forms.LoginFormData], loginUrl: String)(implicit messages: Messages)
+@(loginForm: Form[forms.LoginFormData], loginUrl: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @_template(None) {
-<div>
-    <div class="row">
-        <div class="medium-4 medium-centered columns">
-            <h3 class="text-center">@messages("signin")</h3>
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 402px;">
+    <div class="mdl-card mdl-cell mdl-cell--12-col">
+        <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h3 class="mdl-cell mdl-cell--12-col">@messages("signin")</h3>
+                </div>
+            </div>
+            <div class="section__circle-container mdl-cell">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+            <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+                <form method="post" id="loginForm" action="@loginUrl">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--11-col mdl-cell--1-offset">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" id="email" name="username" value="@loginForm("email").value" required >
+                                <label class="mdl-textfield__label" for="email">write@@your.email</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--11-col mdl-cell--1-offset">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="password" id="password" name="password" value="@loginForm("password").value" required >
+                                <label class="mdl-textfield__label" for="password">Password...</label>
+                                @loginForm.globalError.map { formError =>
+                                <span class="mdl-textfield__error">@formError.message</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--11-col mdl-cell--1-offset mdl-textfield--align-right">
+                            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Login</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="mdl-grid mdl-grid--no-spacing">
+                    <div class="mdl-cell mdl-cell--11-col mdl-cell--1-offset mdl-textfield--align-right">
+                        <p>@Messages("signin.forgot.question")<a href="routes.Authentication.forgotPassword">@Messages("signin.forgot")</a></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <a href="#" class="mdl-button">Read our features</a>
         </div>
     </div>
-    <form method="post" action="@loginUrl">
-        <div class="row">
-            <div class="medium-4 medium-centered columns">
-                <label>Email
-                    <input type="email" placeholder="write@@your.email" name="username" value="@loginForm("email").value" required />
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="medium-4 medium-centered columns">
-                <label>Password
-                    <input type="password" placeholder="password" name="password" value="@loginForm("password").value" required />
-                    @loginForm.globalError.map { formError =>
-                    <span class="form-error is-visible">@formError.message</span>
-                    }
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="medium-4 medium-centered columns">
-                <button type="submit" class="button expanded">Login</button>
-            </div>
-        </div>
-    </form>
-    <div class="row">
-        <div class="medium-4 medium-centered columns">
-            <p>@Messages("signin.forgot.question") <a href="routes.Authentication.forgotPassword">@Messages("signin.forgot")</a></p>
-        </div>
-    </div>
-</div>
+</section>
+
 }

@@ -1,0 +1,105 @@
+@(currentPage: Page[(models.Board, models.Post)], currentOrderBy: Int, currentFilter: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
+
+@****************************************
+* Helper generating navigation links    *
+****************************************@
+@link(board_key: String, newPage: Int, newOrderBy: Option[Int] = None) = @{
+    routes.Post.listPost(board_key, newPage, newOrderBy.map { orderBy =>
+        if(orderBy == scala.math.abs(currentOrderBy)) -currentOrderBy else orderBy
+    }.getOrElse(currentOrderBy), currentFilter)
+}
+
+@**********************************
+* Helper generating table headers *
+***********************************@
+@header(board_key: String, orderBy: Int, title: String) = {
+<th class="col@orderBy header @if(scala.math.abs(currentOrderBy) == orderBy) @{if(currentOrderBy < 0) "headerSortDown" else "headerSortUp"}">
+<a href="@link(board_key, 0, Some(orderBy))">@title</a>
+</th>
+}
+
+@_template(None) {
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 830px;">
+    <div class="mdl-card mdl-cell mdl-cell--12-col">
+
+        @Option(currentPage.items).filterNot(_.isEmpty).map { items =>
+        <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h3 class="mdl-cell mdl-cell--12-col">@messages("post.title")</h3>
+                </div>
+            </div>
+            <div class="section__circle-container mdl-cell">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+            <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+
+                <table class="mdl-data-table mdl-js-data-table" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric"> 번호 </th>
+                        <th class="mdl-data-table__cell--non-numeric" style="width: 70%;"> 제목 </th>
+                        <th class="mdl-data-table__cell--non-numeric"> 글쓴이 </th>
+                        <th> 조회수 </th>
+                        <th class="mdl-data-table__cell--non-numeric"> 날짜 </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @items.map {
+                        case (board, post) => {
+                        <tr>
+                            <td class="mdl-data-table__cell--non-numeric"> No </td>
+                            <td class="mdl-data-table__cell--non-numeric"> <a href="@routes.Post.viewPost(board.key, post.id.toString())">@post.title</a> </td>
+                            <td class="mdl-data-table__cell--non-numeric"> @post.postUser.username </td>
+                            <td> @post.postInfo.hit </td>
+                            <td class="mdl-data-table__cell--non-numeric"> @post.created_datetime </td>
+                        </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+
+                <div class="mdl-grid mdl-card--border">
+                    <div class="mdl-cell mdl-cell--2-col mdl-cell--10-offset">
+                        <a href="@routes.Post.handleNewPost(items.head._1.key)">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글쓰기</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <div id="pagination" class="pagination">
+                <ul>
+                    @currentPage.prev.map { page =>
+                    <li class="prev">
+                        <a href="@link(items.head._1.key, page)">&larr; Previous</a>
+                    </li>
+                    }.getOrElse {
+                    <li class="prev disabled">
+                        <a>&larr; Previous</a>
+                    </li>
+                    }
+                    @for( page <- 1 to currentPage.totalPage ){
+                        <li> <a href="@link(items.head._1.key, page - 1)">@page</a> </li>
+                    }
+                    <li class="current">
+                        <a>Displaying @(currentPage.offset + 1) to @(currentPage.offset + items.size) of @currentPage.total</a>
+                    </li>
+                    @currentPage.next.map { page =>
+                    <li class="next">
+                        <a href="@link(items.head._1.key, page)">Next &rarr;</a>
+                    </li>
+                    }.getOrElse {
+                    <li class="next disabled">
+                        <a>Next &rarr;</a>
+                    </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        }
+
+    </div>
+</section>
+}

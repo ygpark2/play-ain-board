@@ -1,0 +1,72 @@
+@(post: models.Post, board: models.Board)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@_template(None) {
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 830px;">
+    <div class="mdl-card mdl-cell mdl-cell--12-col">
+        <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h3 class="mdl-cell mdl-cell--12-col">@messages("post.title")</h3>
+                </div>
+            </div>
+            <div class="section__circle-container mdl-cell">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+            <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+
+                <table class="mdl-data-table mdl-js-data-table" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric"> 번호 </th>
+                        <th class="mdl-data-table__cell--non-numeric" style="width: 70%;"> 제목 </th>
+                        <th class="mdl-data-table__cell--non-numeric"> 글쓴이 </th>
+                        <th> 조회수 </th>
+                        <th class="mdl-data-table__cell--non-numeric"> 날짜 </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td class="mdl-data-table__cell--non-numeric"> No </td>
+                            <td class="mdl-data-table__cell--non-numeric"> @post.title </td>
+                            <td class="mdl-data-table__cell--non-numeric"> @post.postUser.username </td>
+                            <td> @post.postInfo.hit </td>
+                            <td class="mdl-data-table__cell--non-numeric"> @post.created_datetime </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="mdl-grid mdl-card--border">
+                    <div class="mdl-cell mdl-cell--4-col"></div>
+                    <div class="mdl-cell mdl-cell--2-col">
+                        <a href="@routes.Post.listPost(board.key)">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글목록</button>
+                        </a>
+                    </div>
+                    <div class="mdl-cell mdl-cell--2-col">
+                        <a href="@routes.Post.editPost(board.key, post.id.toString())">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글수정</button>
+                        </a>
+                    </div>
+                    <div class="mdl-cell mdl-cell--2-col">
+                        <a href="@routes.Post.deletePost(board.key, post.id.toString())">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글삭제</button>
+                        </a>
+                    </div>
+                    <div class="mdl-cell mdl-cell--2-col">
+                        <a href="@routes.Post.newPost(board.key)">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글쓰기</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <!--
+            <a href="#" class="mdl-button">Read our features</a>
+            -->
+        </div>
+    </div>
+</section>
+}

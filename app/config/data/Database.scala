@@ -3,7 +3,7 @@ package config.data
 
 import javax.inject.Inject
 
-import models.{Boards, Posts, Users}
+import models._
 
 trait Database {
   def create(): Unit
@@ -13,7 +13,8 @@ trait Database {
 class TestDatabase @Inject() (
                                users: Users,
                                posts: Posts,
-                               boards: Boards
+                               boards: Boards,
+                               boardCategories: BoardCategories
                              ) extends Database {
 
   initialize() // running initialization in constructor
@@ -22,7 +23,7 @@ class TestDatabase @Inject() (
     println("Setup database with test data here")
   }
 
-  def create() = Seq(users, posts, boards).foreach(t => t.ensureSchemaCreated)
+  def create() = Seq(users, boards, boardCategories, posts).foreach(t => t.ensureSchemaCreated)
 
   def drop() = ()
 }
@@ -30,7 +31,8 @@ class TestDatabase @Inject() (
 class DevDatabase @Inject() (
                               users: Users,
                               posts: Posts,
-                              boards: Boards
+                              boards: Boards,
+                              boardCategories: BoardCategories
                             ) extends Database {
 
   initialize() // running initialization in constructor
@@ -40,7 +42,7 @@ class DevDatabase @Inject() (
     create()
   }
 
-  def create() = Seq(users, posts, boards).foreach(t => {
+  def create() = Seq(users, boards, boardCategories, posts).foreach(t => {
     println("================== created table start ===================")
     t.ensureSchemaCreated
     t.loadData()
@@ -53,7 +55,8 @@ class DevDatabase @Inject() (
 class ProdDatabase @Inject() (
                                users: Users,
                                posts: Posts,
-                               boards: Boards
+                               boards: Boards,
+                               boardCategories: BoardCategories
                              ) extends Database {
 
   initialize() // running initialization in constructor

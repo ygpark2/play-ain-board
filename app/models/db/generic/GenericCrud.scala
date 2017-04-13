@@ -32,6 +32,11 @@ abstract class GenericCrud[EntityType <: HasId] extends HasDatabaseConfigProvide
     val id: Rep[UUID] = column[UUID]("id", O.SqlType("UUID"), O.PrimaryKey)
   }
 
+  def getQuery() = query
+
+  /** Count all. */
+  def count(): Future[Int] = db.run(query.length.result)
+
   def find(): Future[Seq[EntityType]] = db.run(query.result)
 
   def find(id: UUID): Future[Option[EntityType]] = db.run(idFilter(id).result.headOption)

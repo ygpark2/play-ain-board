@@ -1,39 +1,70 @@
-@(profiles: List[org.pac4j.core.profile.CommonProfile], csrfToken: String, sessionId: String)
-<h1>index</h1>
-<a href="facebook/index.html">Protected url by Facebook : facebook/index.html</a> (use a real account)<br />
-<a href="facebookadmin/index.html">Protected url by Facebook with ROLE_ADMIN: facebookadmin/index.html</a> (use a real account)<br />
-<a href="facebookcustom/index.html">Protected url by Facebook with custom authorizer (= must be a <em>CommonProfile</em> where the username starts with "jle"): facebookcustom/index.html</a> (login with form or basic authentication before with jle* username)<br />
-<a href="twitter/index.html">Protected url by Twitter: twitter/index.html</a> or <a href="twitter/index.html?client_name=FacebookClient">by Facebook: twitter/index.html?client_name=FacebookClient</a> (use a real account)<br />
-<a href="form/index.html">Protected url by form authentication : form/index.html</a> (use login = pwd)<br />
-<a href="javascript:ajaxClick();">Click here to send AJAX request after performing form authentication</a><br />
-<a href="basicauth/index.html">Protected url by basic auth : basicauth/index.html</a> (use login = pwd)<br />
-<br />
-<a href="protected/index.html">Protected url: protected/index.html</a> (won't start any login process)<br />
-<a href="protected/custom.html">Protected url: protected/custom.html</a> (won't start any login process, but requires a jle* username)<br />
-<br />
-<a href="jwt.html">Generate a JWT token</a><br />
-<a href="/dba/index.html">Protected url by DirectBasicAuthClient: /dba/index.html</a> (POST the <em>Authorization</em> header with value: <em>Basic amxlbGV1OmpsZWxldQ==</em>) then by <a href="/dba/index.html">ParameterClient: /dba/index.html</a> (with request parameter: token=<em>jwt_generated_token</em>)<br />
-<a href="/rest-jwt/index.html">Protected url by ParameterClient: /rest-jwt/index.html</a> (with request parameter: token=<em>jwt_generated_token</em>)<br />
-<br />
-<form method="POST" action="/csrf/index.html">
-    Token: <input type="text" name="pac4jCsrfToken" value="@csrfToken" /><br />
-    <input type="submit" value="Protected by CSRF token: /csrf/index.html" />
-</form>
-<a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
-<br />
-<a href="/logout?url=/?forcepostlogouturl">local logout</a><br />
-<br/>
-<a href="/centralLogout?url=http://localhost:9000/?forcepostlogouturlafteridp">central logout</a>
-<br /><br />
-profiles: @profiles<br />
-<br />
-sessionId: @sessionId
-<br /><br />
-<br />
-<br />
+@(profiles: List[org.pac4j.core.profile.CommonProfile], csrfToken: String, sessionId: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
-<!-- Link to Google CDN's jQuery; fall back to local -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="assets/js/jquery.min.js"><\/script>')</script>
+@_template(None) {
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 80%;">
+    <div class="mdl-card mdl-cell mdl-cell--12-col">
+        <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+            <h4 class="mdl-cell mdl-cell--12-col">index</h4>
+            <div class="section__circle-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+            <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+                <h5>Lorem ipsum dolor sit amet</h5>
+                <a href="facebook/index.html">Protected url by Facebook : facebook/index.html</a> (use a real account)<br />
+                <a href="facebookadmin/index.html">Protected url by Facebook with ROLE_ADMIN: facebookadmin/index.html</a> (use a real account)<br />
+                <a href="facebookcustom/index.html">Protected url by Facebook with custom authorizer (= must be a <em>CommonProfile</em> where the username starts with "jle"): facebookcustom/index.html</a> (login with form or basic authentication before with jle* username)<br />
+                <a href="twitter/index.html">Protected url by Twitter: twitter/index.html</a> or <a href="twitter/index.html?client_name=FacebookClient">by Facebook: twitter/index.html?client_name=FacebookClient</a> (use a real account)<br />
+                <a href="form/index.html">Protected url by form authentication : form/index.html</a> (use login = pwd)<br />
+                <a href="javascript:ajaxClick();">Click here to send AJAX request after performing form authentication</a><br />
+                <a href="basicauth/index.html">Protected url by basic auth : basicauth/index.html</a> (use login = pwd)<br />
+                <br />
+                <a href="protected/index.html">Protected url: protected/index.html</a> (won't start any login process)<br />
+                <a href="protected/custom.html">Protected url: protected/custom.html</a> (won't start any login process, but requires a jle* username)<br />
+                <br />
+                <a href="jwt.html">Generate a JWT token</a><br />
+                <a href="/dba/index.html">Protected url by DirectBasicAuthClient: /dba/index.html</a> (POST the <em>Authorization</em> header with value: <em>Basic amxlbGV1OmpsZWxldQ==</em>) then by <a href="/dba/index.html">ParameterClient: /dba/index.html</a> (with request parameter: token=<em>jwt_generated_token</em>)<br />
+                <a href="/rest-jwt/index.html">Protected url by ParameterClient: /rest-jwt/index.html</a> (with request parameter: token=<em>jwt_generated_token</em>)<br />
+                <br />
+                <form method="POST" action="/csrf/index.html">
+                    Token: <input type="text" name="pac4jCsrfToken" value="@csrfToken" /><br />
+                    <input type="submit" value="Protected by CSRF token: /csrf/index.html" />
+                </form>
+                <a href="forceLogin?client_name=FacebookClient">Force Facebook login</a> (even if already authenticated)<br />
+                <br />
+                <a href="/logout?url=/?forcepostlogouturl">local logout</a><br />
+                <br/>
+                <a href="/centralLogout?url=http://localhost:9000/?forcepostlogouturlafteridp">central logout</a>
+                <br /><br />
+                profiles: @profiles<br />
+                <br />
+                sessionId: @sessionId
+                <br />
+                <br />
+                <br />
+                <br />
+            </div>
+            <div class="section__circle-container mdl-cell mdl-cell--2-col mdl-cell--1-col-phone">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <a href="#" class="mdl-button">Read our features</a>
+        </div>
+    </div>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="btn2" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">more_vert</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple is-animating" style="width: 92.5097px; height: 92.5097px; transform: translate(-50%, -50%) translate(12px, 23px);"></span>
+        </span>
+    </button>
+    <div class="mdl-menu__container is-upgraded" style="right: 8px; top: 40px; width: 124px; height: 160px;">
+        <div class="mdl-menu__outline mdl-menu--bottom-right" style="width: 124px; height: 160px;"></div>
+        <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="btn2" data-upgraded=",MaterialMenu" style="clip: rect(0px 124px 0px 124px);">
+            <li class="mdl-menu__item" tabindex="-1">Lorem</li>
+            <li class="mdl-menu__item" disabled="" tabindex="-1">Ipsum</li>
+            <li class="mdl-menu__item" tabindex="-1">Dolor</li>
+        </ul>
+    </div>
+</section>
 
-<script src="assets/js/app.js"></script>
+}

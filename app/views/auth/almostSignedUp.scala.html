@@ -1,7 +1,27 @@
-
-@(user: forms.SignupFormData)(implicit messages: Messages)
+@(user: forms.SignupFormData)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @_template(None) {
-    <p>@Messages("signup.thanks", user.name)</p>
-    <p>@Messages("signup.sent", user.email)</p>
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 630px;">
+    <div class="mdl-card mdl-cell mdl-cell--12-col">
+        <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                    <h3 class="mdl-cell mdl-cell--12-col">@messages("signup.info")</h3>
+                </div>
+            </div>
+            <div class="section__circle-container mdl-cell">
+                <div class="section__circle-container__circle mdl-color--primary"></div>
+            </div>
+            <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+                <p>@Messages("signup.thanks", user.name)</p>
+                <p>@Messages("signup.sent", user.email)</p>
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <!--
+            <a href="#" class="mdl-button">Read our features</a>
+            -->
+        </div>
+    </div>
+</section>
 }

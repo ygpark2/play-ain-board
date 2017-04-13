@@ -1,8 +1,11 @@
 
 # Public urls
 GET         /                                 controllers.Application.index()
-GET         /loginForm                        controllers.Application.loginForm()
+GET         /login                            controllers.Application.loginForm()
 GET         /jwt.html                         controllers.Application.jwt()
+GET         /signup                           controllers.Authentication.signup()
+POST        /signup                           controllers.Authentication.handleSignUp()
+GET		    /signup/:token				      controllers.Authentication.verifySignUp(token: String)
 
 # URLs protected via Controller
 GET         /facebook/index.html              controllers.Application.facebookIndex()
@@ -41,9 +44,19 @@ POST        /callback                         @org.pac4j.play.CallbackController
 GET         /logout                           @org.pac4j.play.LogoutController.logout()
 # GET         /centralLogout                    controllers.CentralLogoutController.logout()
 
-GET         /signup                     controllers.Authentication.signup()
-POST        /signup                     controllers.Authentication.handleSignUp()
-GET		    /signup/:token				controllers.Authentication.verifySignUp(token: String)
+# Board
+GET         /board/new                         controllers.Board.newBoard()
+POST        /board/new                         controllers.Board.handleNewBoard()
+
+# Post
+GET         /post/:board_key/new               controllers.Post.newPost(board_key)
+POST        /post/:board_key/new               controllers.Post.handleNewPost(board_key)
+GET         /post/:board_key/list              controllers.Post.listPost(board_key, p:Int ?= 0, s:Int ?= 4, f ?= "")
+GET         /post/:board_key/view/:id          controllers.Post.viewPost(board_key, id)
+GET         /post/:board_key/edit/:id          controllers.Post.editPost(board_key, id)
+POST        /post/:board_key/edit/:id          controllers.Post.handleEditPost(board_key, id)
+GET         /post/:board_key/delete/:id        controllers.Post.deletePost(board_key, id)
+
 
 # GET		/login						controllers.Authentication.prepareLogin()
 # POST	/login						controllers.Authentication.login()
@@ -69,5 +82,7 @@ GET		    /signup/:token				controllers.Authentication.verifySignUp(token: String
 
 # DELETE  /projects/:name                      controllers.Application.delete(name: String)
 
+# Map static resources from the /public folder to the /assets URL path
 GET     /favicon.ico                        controllers.Assets.at(path="/public", file="favicon.ico")
 GET     /assets/*file                       controllers.Assets.at(path="/public", file)
+GET     /webjars/*file                      controllers.WebJarAssets.at(file)

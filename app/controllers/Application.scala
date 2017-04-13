@@ -29,6 +29,7 @@ class Application @Inject() (val config: Config,
                              val messagesApi: MessagesApi,
                              val userForms: UserForms,
                              val playSessionStore: PlaySessionStore,
+                             implicit val webJarAssets: WebJarAssets,
                              override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
 
   private def getProfiles(implicit request: RequestHeader): List[CommonProfile] = {
