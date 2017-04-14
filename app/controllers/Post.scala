@@ -210,7 +210,7 @@ class Post @Inject()(val config: Config,
     Action.async { implicit request =>
       val boardList = boards.postList(board_key, page = page, orderBy = orderBy, filter = ("%" + filter + "%"))
       boardList.map(ps => {
-        Ok(views.html.board.post.list(Some(profiles), ps, orderBy, filter))
+        Ok(views.html.board.post.list(Some(profiles), ps, orderBy, filter, board_key))
       })
     }
   }

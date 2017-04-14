@@ -10,7 +10,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import play.api.data.{Form, Mapping}
 import play.api.data.Forms._
-import services.DBService
+import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
+
 
 case class LoginFormData(email: String, password: String)
 
@@ -41,6 +44,14 @@ class UserForms @Inject()(val users: Users) {
       case _ => Valid
     }
   }
+
+  val emailForm = Form(single("email" -> email))
+
+  val passwordValidation = nonEmptyText(minLength = 6)
+  val resetPasswordForm = Form(tuple(
+    "password1" -> passwordValidation,
+    "password2" -> nonEmptyText
+  ) verifying (Messages("auth.passwords.notequal"), passwords => passwords._2 == passwords._1))
 
   private[this] def userForm(passwordMapping:Mapping[String]) = Form(
     mapping(

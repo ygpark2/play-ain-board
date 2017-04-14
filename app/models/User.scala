@@ -33,6 +33,8 @@ case class User( id: UUID,
 
   def withEmailConfirmed(v : Boolean) : User = this.copy(emailConfirmed = v)
 
+  def withEmailConfirmedPassword(v : Boolean, p: String) : User = this.copy(emailConfirmed = v, password = p)
+
   def isAdmin: Boolean = role == AdminRole
 }
 
@@ -115,7 +117,7 @@ class Users @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) ex
   override protected val testData = {
     val salt = generateSalt
     List(
-      User(UUID.randomUUID(), Common(), "test_name1", "email1@abc.com", false, "password".bcrypt(salt), salt, 2, 283, NormalRole),
+      User(UUID.randomUUID(), Common(), "test_name1", "email1@abc.com", false, "password".bcrypt(salt), salt, 2, 283, AdminRole),
       User(UUID.randomUUID(), Common(), "test_name2", "email2@abc.com", false, "password".bcrypt(salt), salt, 4, 383, NormalRole)
     )
   }

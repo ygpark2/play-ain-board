@@ -6,6 +6,11 @@ GET         /jwt.html                         controllers.Application.jwt()
 GET         /signup                           controllers.Authentication.signup()
 POST        /signup                           controllers.Authentication.handleSignUp()
 GET		    /signup/:token				      controllers.Authentication.verifySignUp(token: String)
+GET		    /forgot-password		          controllers.Authentication.forgotPassword()
+POST	    /forgot-password		          controllers.Authentication.handleForgotPassword()
+GET		    /reset-password/:token	          controllers.Authentication.resetPassword(token: String)
+POST	    /reset-password/:token	          controllers.Authentication.handleResetPassword(token: String)
+
 
 # URLs protected via Controller
 GET         /facebook/index.html              controllers.Application.facebookIndex()

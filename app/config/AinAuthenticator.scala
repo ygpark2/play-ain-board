@@ -26,12 +26,6 @@ class AinAuthenticator extends Authenticator[UsernamePasswordCredentials] {
 
   val passwordEncoder = new BlowfishPasswordEncoder()
 
-  /*
-  val injector = Guice.createInjector()
-  play.api.Play.current.injector
-  val users = injector.getInstance(classOf[Users])
-  */
-
   override def validate(creds: UsernamePasswordCredentials, ctx: WebContext):Unit = {
 
     println("+++++++++++++++++++++++++++++++++++++")
@@ -84,14 +78,15 @@ class AinAuthenticator extends Authenticator[UsernamePasswordCredentials] {
     val profile = new DbProfile
     profile.setId(user.id)
 
-    profile.addAttribute("name", user.name)
+    profile.addAttribute("display_name", user.name)
     profile.addAttribute("email", user.email)
+
     /*
     for (attribute <- attributes) {
       profile.addAttribute(attribute, user..get(attribute)
     }
     */
-    profile.addRole("ROLE_ADMIN")
+    profile.addRole(user.role.toString)
     profile
   }
 }

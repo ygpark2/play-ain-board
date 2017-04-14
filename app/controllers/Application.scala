@@ -48,6 +48,7 @@ class Application @Inject() (val config: Config,
       if(profiles.head.getTypedId().equals("anonymous")) {
           println("AnonymousProfile =============================")
         }
+      println("role => " + profiles.head.getDisplayName())
 
       Ok(views.html.index(Some(profiles), csrfToken, sessionId))
     }

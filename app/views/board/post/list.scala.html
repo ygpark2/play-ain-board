@@ -1,4 +1,4 @@
-@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], currentPage: Page[(models.Board, models.Post)], currentOrderBy: Int, currentFilter: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], currentPage: Page[(models.Board, models.Post)], currentOrderBy: Int, currentFilter: String, board_key: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @****************************************
 * Helper generating navigation links    *
@@ -22,7 +22,6 @@
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 1030px;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">
 
-        @Option(currentPage.items).filterNot(_.isEmpty).map { items =>
         <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
             <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--12-col">
@@ -45,23 +44,28 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @items.map {
-                        case (board, post) => {
-                        <tr>
-                            <td class="mdl-data-table__cell--non-numeric"> No </td>
-                            <td class="mdl-data-table__cell--non-numeric"> <a href="@routes.Post.viewPost(board.key, post.id.toString())">@post.title</a> </td>
-                            <td class="mdl-data-table__cell--non-numeric"> @post.postUser.username </td>
-                            <td> @post.postInfo.hit </td>
-                            <td class="mdl-data-table__cell--non-numeric"> @post.created_datetime </td>
-                        </tr>
+                    @Option(currentPage.items).filterNot(_.isEmpty).map { items =>
+                        @items.map {
+                            case (board, post) => {
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric"> No </td>
+                                <td class="mdl-data-table__cell--non-numeric"> <a href="@routes.Post.viewPost(board.key, post.id.toString())">@post.title</a> </td>
+                                <td class="mdl-data-table__cell--non-numeric"> @post.postUser.username </td>
+                                <td> @post.postInfo.hit </td>
+                                <td class="mdl-data-table__cell--non-numeric"> @post.created_datetime </td>
+                            </tr>
+                            }
                         }
+                    }.getOrElse {
+                        <tr> <td class="mdl-data-table__cell--non-numeric" colspan="5"> <h3> There are not posts yet !!! <h3> </td> </tr>
                     }
+
                     </tbody>
                 </table>
 
                 <div class="mdl-grid mdl-card--border">
                     <div class="mdl-cell mdl-cell--2-col mdl-cell--10-offset">
-                        <a href="@routes.Post.handleNewPost(items.head._1.key)">
+                        <a href="@routes.Post.handleNewPost(board_key)">
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글쓰기</button>
                         </a>
                     </div>
@@ -72,16 +76,16 @@
             <div class="paginate wrapper" style="padding: 0em;">
                 <ul>
                     @currentPage.prev.map { page =>
-                    <li> <a href="@link(items.head._1.key, page)">&larr; Previous</a> </li>
+                    <li> <a href="@link(board_key, page)">&larr; Previous</a> </li>
                     }.getOrElse {
                     <li class="inactive"> <a>&larr; Previous</a> </li>
                     }
                     @for( page <- 1 to currentPage.totalPage ){
-                        <li> <a href="@link(items.head._1.key, page - 1)">@page</a> </li>
+                        <li> <a href="@link(board_key, page - 1)">@page</a> </li>
                     }
                     @currentPage.next.map { page =>
                     <li class="next">
-                        <a href="@link(items.head._1.key, page)">Next &rarr;</a>
+                        <a href="@link(board_key, page)">Next &rarr;</a>
                     </li>
                     }.getOrElse {
                     <li class="inactive">
@@ -91,7 +95,6 @@
                 </ul>
             </div>
         </div>
-        }
 
     </div>
 </section>
