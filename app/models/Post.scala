@@ -81,6 +81,7 @@ case class Post(id: UUID,
 
   def incHit(v : Int) : Post = this.copy(postInfo = postInfo.copy(hit = v))
 
+  def incCommentCnt(v : Int) : Post = this.copy(comment_count = v, comment_updated_datetime = java.sql.Timestamp.valueOf(LocalDateTime.now()))
   // def withEmailConfirmed(v : Boolean) : User = this.copy(emailConfirmed = v)
 
 }
@@ -119,6 +120,8 @@ class Posts @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) ex
 
   def findByCategory(category: UUID): Future[List[Post]] =
     db.run(query.filter(_.category === category).to[List].result)
+
+
 
   /*
   def findByBoard(board: UUID): Future[Seq[(Post, Board)]] = {

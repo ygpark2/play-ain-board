@@ -12,6 +12,7 @@ trait Database {
 
 class TestDatabase @Inject() (
                                users: Users,
+                               comments: Comments,
                                posts: Posts,
                                boards: Boards,
                                boardCategories: BoardCategories
@@ -23,13 +24,14 @@ class TestDatabase @Inject() (
     println("Setup database with test data here")
   }
 
-  def create() = Seq(users, boards, boardCategories, posts).foreach(t => t.ensureSchemaCreated)
+  def create() = Seq(boards, boardCategories, posts, comments, users).foreach(t => t.ensureSchemaCreated)
 
   def drop() = ()
 }
 
 class DevDatabase @Inject() (
                               users: Users,
+                              comments: Comments,
                               posts: Posts,
                               boards: Boards,
                               boardCategories: BoardCategories
@@ -42,7 +44,7 @@ class DevDatabase @Inject() (
     create()
   }
 
-  def create() = Seq(users, boards, boardCategories, posts).foreach(t => {
+  def create() = Seq(boards, boardCategories, posts, comments, users).foreach(t => {
     println("================== created table start ===================")
     t.ensureSchemaCreated
     t.loadData()
@@ -54,6 +56,7 @@ class DevDatabase @Inject() (
 
 class ProdDatabase @Inject() (
                                users: Users,
+                               comments: Comments,
                                posts: Posts,
                                boards: Boards,
                                boardCategories: BoardCategories

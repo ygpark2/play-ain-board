@@ -61,7 +61,9 @@ GET         /post/:board_key/view/:id          controllers.Post.viewPost(board_k
 GET         /post/:board_key/edit/:id          controllers.Post.editPost(board_key, id)
 POST        /post/:board_key/edit/:id          controllers.Post.handleEditPost(board_key, id)
 GET         /post/:board_key/delete/:id        controllers.Post.deletePost(board_key, id)
-
+POST        /post/:board_key/view/:post_id/comment/new               controllers.Comment.handleNewComment(board_key, post_id)
+POST        /post/:board_key/view/:post_id/comment/edit/:id          controllers.Comment.handleEditComment(board_key, post_id, id)
+POST        /post/:board_key/view/:post_id/comment/delete/:id        controllers.Comment.deleteComment(board_key, post_id, id)
 
 # GET		/login						controllers.Authentication.prepareLogin()
 # POST	/login						controllers.Authentication.login()

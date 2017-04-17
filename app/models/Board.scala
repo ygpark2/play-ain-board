@@ -29,6 +29,7 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
   import driver.api._
 
   val posts: Posts = new Posts(dbConfigProvider)
+  val comments: Comments = new Comments(dbConfigProvider)
 
   override type SpecificTable = BoardsTable
   override protected val query = TableQuery[SpecificTable]
@@ -59,6 +60,16 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
         (boardObj, postObj) <- query joinLeft posts.getQuery().filter(_.id === UUID.fromString(id)) on (_.id === _.board)
       } yield (boardObj, postObj))
     val list = queryVal.result.map { rows => rows.collect { case (board, Some(post)) => (board, post) } }
+    db.run(list)
+  }
+
+  def findByIdJoinPostJoinComment(id: String): Future[Seq[(Board, Post, Comment)]] = {
+    // val postsTable = posts.getQuery().filter(_.id === UUID.fromString(id))
+    val queryVal =
+      (for {
+        ((boardObj, postObj), commentObj) <- query joinLeft posts.getQuery().filter(_.id === UUID.fromString(id)) on (_.id === _.board) joinLeft comments.getQuery() on (_._2.map(_.id) === _.post)
+      } yield ((boardObj, postObj), commentObj))
+    val list = queryVal.result.map { rows => rows.collect { case ((board, Some(post)), Some(comment)) => (board, post, comment) } }
     db.run(list)
   }
 
@@ -125,7 +136,7 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
     db.run(query.filter(_.project === projectId).delete)
   */
 
-  protected class BoardsTable(tag: Tag) extends AbstractTable(tag, "BOARD") {
+  protected class BoardsTable(tag: Tag) extends AbstractTable(tag, TableName) {
 
     def key = column[String]("KEY")
     def name = column[String]("NAME")

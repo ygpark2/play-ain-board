@@ -49,7 +49,10 @@
                             case (board, post) => {
                             <tr>
                                 <td class="mdl-data-table__cell--non-numeric"> No </td>
-                                <td class="mdl-data-table__cell--non-numeric"> <a href="@routes.Post.viewPost(board.key, post.id.toString())">@post.title</a> </td>
+                                <td class="mdl-data-table__cell--non-numeric">
+                                    <a href="@routes.Post.viewPost(board.key, post.id.toString())">@post.title</a>
+                                    ( <b>@post.comment_count</b> )
+                                </td>
                                 <td class="mdl-data-table__cell--non-numeric"> @post.postUser.username </td>
                                 <td> @post.postInfo.hit </td>
                                 <td class="mdl-data-table__cell--non-numeric"> @post.created_datetime </td>

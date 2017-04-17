@@ -1,4 +1,4 @@
-@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], post: models.Post, board: models.Board)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], newCommentForm: Form[forms.NewCommentFormData], post: models.Post, board: models.Board, comments: Seq[models.Comment])(implicit messages: Messages, webJarAssets: WebJarAssets)
 @_template(profiles) {
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 1030px;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">
@@ -13,7 +13,7 @@
             </div>
             <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
 
-                <table class="mdl-data-table mdl-js-data-table" style="width: 100%;">
+                <table class="mdl-data-table mdl-js-data-table" style="width: 100%; min-height: 500px;">
                     <thead>
                         <tr>
                             <th class="mdl-data-table__cell--non-numeric" style="width: 10%"> 번호
@@ -46,30 +46,134 @@
                 </table>
 
                 <div class="mdl-grid mdl-card--border">
-                    <div class="mdl-cell mdl-cell--7-col"></div>
-                    <div class="mdl-cell mdl-cell--5-col">
-                        <a href="@routes.Post.listPost(board.key)">
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글목록</button>
-                        </a>
+                    <div class="mdl-cell mdl-cell--12-col">
 
-                        <a href="@routes.Post.editPost(board.key, post.id.toString())">
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글수정</button>
-                        </a>
+                        @Option(comments).filterNot(_.isEmpty).map { cs =>
+                            @cs.map {
+                                case (c) => {
+                                    <div class="mdl-grid mdl-card--border">
+                                        <div class="mdl-cell mdl-cell--2-col">
+                                            @c.commentUser.username <br/>
+                                            @c.commentUser.email
+                                        </div>
+                                        <div class="mdl-cell mdl-cell--8-col">
+                                            @c.content
+                                        </div>
+                                        <div class="mdl-cell mdl-cell--2-col">
+                                            @c.created_datetime
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
 
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored dialog-button">글삭제</button>
-                        <dialog id="dialog" class="mdl-dialog">
-                            <h3 class="mdl-dialog__title">Delete Confirm Dialog</h3>
-                            <div class="mdl-dialog__content">
-                                <p>
-                                    Do you really want to delete this article?
-                                </p>
-                            </div>
-                            <div class="mdl-dialog__actions">
-                                <button type="button" class="mdl-button">No</button>
-                                <button type="button" class="mdl-button">Yes</button>
-                            </div>
-                        </dialog>
-                        <script>
+                    </div>
+                </div>
+
+                <div class="mdl-grid mdl-card--border">
+                    <div class="mdl-cell mdl-cell--12-col">
+                        <div class="section__text mdl-cell mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
+                            <form method="post" id="newCommentForm" action="@routes.Comment.handleNewComment(board.key, post.id.toString)">
+                                <div class="mdl-grid mdl-grid--no-spacing">
+                                    <div class="mdl-cell mdl-cell--12-col">
+                                        <div class="mdl-grid">
+                                            <div class="mdl-cell mdl-cell--4-col">
+                                                <div class="mdl-textfield mdl-js-textfield">
+                                                    <input class="mdl-textfield__input" type="text" id="username" name="username" value="@newCommentForm("username").value" required >
+                                                    <label class="mdl-textfield__label" for="username">User Name</label>
+                                                    @newCommentForm.error("username").map { formError =>
+                                                    <span class="form-error is-visible">@formError.message</span>
+                                                    }
+                                                </div>
+                                                <div class="mdl-textfield mdl-js-textfield">
+                                                    <input class="mdl-textfield__input" type="text" id="homepage" name="homepage" value="@newCommentForm("homepage").value" required >
+                                                    <label class="mdl-textfield__label" for="homepage">Homepage</label>
+                                                    @newCommentForm.error("homepage").map { formError =>
+                                                    <span class="form-error is-visible">@formError.message</span>
+                                                    }
+                                                </div>
+                                                <div class="mdl-textfield mdl-js-textfield">
+                                                    <input class="mdl-textfield__input" type="text" id="email" name="email" value="@newCommentForm("email").value" required >
+                                                    <label class="mdl-textfield__label" for="email">Email</label>
+                                                    @newCommentForm.error("email").map { formError =>
+                                                    <span class="form-error is-visible">@formError.message</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mdl-grid mdl-grid--no-spacing">
+                                    <div class="mdl-cell mdl-cell--12-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%">
+                                            <textarea class="mdl-textfield__input" rows= "6" id="content" name="content" required >@newCommentForm("content").value</textarea>
+                                            <label class="mdl-textfield__label" for="content">Content</label>
+                                            @newCommentForm.error("content").map { formError =>
+                                            <span class="form-error is-visible">@formError.message</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mdl-grid mdl-grid--no-spacing">
+                                    <div class="mdl-cell mdl-cell--2-col">
+                                        <label class="mdl-checkbox mdl-js-checkbox" for="secret">
+                                            <input type="checkbox" id="secret" name="enable_secret" class="mdl-checkbox__input" value="true" @if(newCommentForm("enable_secret").value.contains("true")){checked="checked"}>
+                                            <span class="mdl-checkbox__label">비밀글</span>
+                                        </label>
+                                    </div>
+                                    <div class="mdl-cell mdl-cell--2-col">
+                                        <label class="mdl-checkbox mdl-js-checkbox" for="html">
+                                            <input type="checkbox" id="html" name="enable_html" class="mdl-checkbox__input" value="true" @if(newCommentForm("enable_html").value.contains("true")){checked="checked"}>
+                                            <span class="mdl-checkbox__label">html사용</span>
+                                        </label>
+                                    </div>
+                                    <div class="mdl-cell mdl-cell--8-col">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <input class="mdl-textfield__input" type="text" id="password" name="password" value="@newCommentForm("password").value" required >
+                                            <label class="mdl-textfield__label" for="password">Password</label>
+                                            @newCommentForm.error("password").map { formError =>
+                                            <span class="form-error is-visible">@formError.message</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell mdl-cell--2-col mdl-cell--10-offset">
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">코멘트 쓰기</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mdl-card__actions">
+            <div class="mdl-grid mdl-card--border">
+                <div class="mdl-cell mdl-cell--7-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                    <a href="@routes.Post.listPost(board.key)">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글목록</button>
+                    </a>
+
+                    <a href="@routes.Post.editPost(board.key, post.id.toString())">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글수정</button>
+                    </a>
+
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored dialog-button">글삭제</button>
+                    <dialog id="dialog" class="mdl-dialog">
+                        <h3 class="mdl-dialog__title">Delete Confirm Dialog</h3>
+                        <div class="mdl-dialog__content">
+                            <p>
+                                Do you really want to delete this article?
+                            </p>
+                        </div>
+                        <div class="mdl-dialog__actions">
+                            <button type="button" class="mdl-button">No</button>
+                            <button type="button" class="mdl-button">Yes</button>
+                        </div>
+                    </dialog>
+                    <script>
                           (function() {
                             'use strict';
                             var dialogButton = document.querySelector('.dialog-button');
@@ -101,18 +205,12 @@
                           //# sourceURL=pen.js
                         </script>
 
-                        <a href="@routes.Post.newPost(board.key)">
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글쓰기</button>
-                        </a>
-                    </div>
-
+                    <a href="@routes.Post.newPost(board.key)">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">글쓰기</button>
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="mdl-card__actions">
-            <!--
-            <a href="#" class="mdl-button">Read our features</a>
-            -->
+
         </div>
     </div>
 </section>

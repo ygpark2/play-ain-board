@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
-import forms.{NewPostFormData, PostForms, UserForms}
+import forms.{CommentForms, NewPostFormData, PostForms, UserForms}
 import models._
 import org.pac4j.core.client.{Clients, IndirectClient}
 import org.pac4j.core.config.Config
@@ -33,6 +33,7 @@ import scala.util.{Failure, Success}
 class Post @Inject()(val config: Config,
                      val messagesApi: MessagesApi,
                      val postForms: PostForms,
+                     val commentForms: CommentForms,
                      val boards: Boards,
                      val playSessionStore: PlaySessionStore,
                      implicit val webJarAssets: WebJarAssets,
@@ -53,6 +54,7 @@ class Post @Inject()(val config: Config,
           Ok(views.html.board.post.newForm(Some(profiles), postForms.newForm, b))
         }
         case _ => {
+
           Ok(views.html.error.notFound(request))
         }
       }
@@ -197,7 +199,8 @@ class Post @Inject()(val config: Config,
           profiles.foreach(println)
           val hit = p.postInfo.hit + 1
           postForms.posts.update(p.incHit(hit))
-          Ok(views.html.board.post.view(Some(profiles), p, b))
+          val comments = Await.result(commentForms.comments.findByPost(id), Duration.Inf)
+          Ok(views.html.board.post.view(Some(profiles), commentForms.newForm, p, b, comments))
         }
         case _ => {
           Ok(views.html.error.notFound(request))
