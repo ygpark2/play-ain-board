@@ -1,4 +1,4 @@
-@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], newCommentForm: Form[forms.NewCommentFormData], post: models.Post, board: models.Board, comments: Seq[models.Comment])(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], newCommentForm: Form[forms.NewCommentFormData], board: models.Board, post: models.Post, comments: Seq[models.Comment])(implicit messages: Messages, webJarAssets: WebJarAssets)
 @_template(profiles) {
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 1030px;">
     <div class="mdl-card mdl-cell mdl-cell--12-col">

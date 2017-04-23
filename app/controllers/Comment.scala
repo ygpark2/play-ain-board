@@ -20,6 +20,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success}
 
 class Comment @Inject()(val config: Config,
                         val messagesApi: MessagesApi,
@@ -41,30 +42,37 @@ class Comment @Inject()(val config: Config,
       val bpInfo = Await.result(boards.findByIdJoinPost(post_id), Duration.Inf)
       val commentResult: Future[Result] = bpInfo.head match {
         case (b, p) =>
-          val comments = Await.result(commentForms.comments.findByPost(post_id), Duration.Inf)
           commentForms.newForm.bindFromRequest.fold(
-            formWithErrors => Future.successful( BadRequest(views.html.board.post.view(Some(profiles), formWithErrors, p, b, comments)) ),
+            formWithErrors => {
+              val comments = Await.result(commentForms.comments.findByPost(post_id), Duration.Inf)
+              Future.successful( BadRequest(views.html.board.post.view(Some(profiles), formWithErrors, b, p, comments)) )
+            },
             commentFormData => {
               val salt = generateSalt
               val commentUser = CommentUser("userid", commentFormData.username, "nickname", commentFormData.email, commentFormData.homepage)
 
-              val commentInfo = CommentInfo(0, 0, "", 0, "")
+              val commentInfo = CommentInfo(0, 0, request.remoteAddress, 0, request.headers.get("User-Agent").getOrElse("") )
 
               val comment = Comment(UUID.randomUUID(), b.id, p.id, commentFormData.content, commentFormData.password.bcrypt(salt),
                 commentFormData.enable_secret, commentFormData.enable_html, java.sql.Timestamp.valueOf(LocalDateTime.now()),
                 java.sql.Timestamp.valueOf(LocalDateTime.now()), "", commentUser, commentInfo, false)
 
               val cc = p.comment_count + 1
-              for {
-                comment_cnt <- commentForms.comments.insert(comment)
-                post_cnt <- boards.posts.update(p.incCommentCnt(cc))
-              } yield {
-                if (comment_cnt > 0 && post_cnt > 0) {
+              commentForms.comments.insert(comment).andThen {
+                case Failure(cf) => -1
+                case Success(cv) => {
+                  boards.posts.update(p.incCommentCnt(cc)).andThen {
+                    case Failure(pt) => -1
+                    case Success(pv) => 1
+                  }
+                }
+              }.map(v => {
+                if (v > 0) {
                   Redirect(routes.Post.viewPost(board_key, post_id))
                 } else {
                   Ok(views.html.error.notFound(request))
                 }
-              }
+              })
             }
           )
         case _ => Future.successful( Ok(views.html.error.notFound(request)) )
@@ -100,7 +108,7 @@ class Comment @Inject()(val config: Config,
         case (b, p) =>
           val comments = Await.result(commentForms.comments.findByPost(id), Duration.Inf)
           commentForms.newForm.bindFromRequest.fold(
-            formWithErrors => Future.successful( BadRequest(views.html.board.post.view(Some(profiles), formWithErrors, p, b, comments)) ),
+            formWithErrors => Future.successful( BadRequest(views.html.board.post.view(Some(profiles), formWithErrors, b, p, comments)) ),
             commentFormData => {
               val comment = Await.result(commentForms.comments.find(UUID.fromString(id)), Duration.Inf)
               comment match {

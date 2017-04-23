@@ -5,6 +5,9 @@ import javax.inject.Inject
 
 import models._
 
+import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait Database {
   def create(): Unit
   def drop(): Unit
@@ -46,8 +49,10 @@ class DevDatabase @Inject() (
 
   def create() = Seq(boards, boardCategories, posts, comments, users).foreach(t => {
     println("================== created table start ===================")
-    t.ensureSchemaCreated
-    t.loadData()
+    t.ensureSchemaCreated.andThen {
+      case Failure(t) => println(t)
+      case Success(v) => t.loadData()
+    }
     println("================== created table end ===================")
   })
 

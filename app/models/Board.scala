@@ -37,14 +37,14 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
   override protected val TableName = "BOARDS"
 
   /** Count with a filter. */
-  def count(filter: String): Future[Int] =
+  def count(field: String = "title", filter: String): Future[Int] =
     db.run(query.filter { board => board.name.toLowerCase like filter.toLowerCase }.length.result)
 
   /** Count with a filter. */
-  def postCount(key: String, filter: String): Future[Int] = {
+  def postCount(key: String, field: String, filter: String): Future[Int] = {
     val queryVal =
       (for {
-        (boardObj, postObj) <- query.filter(_.key === key) joinLeft posts.getQuery() on (_.id === _.board)
+        (boardObj, postObj) <- query.filter(_.key === key) joinLeft getPosts(filter, filter) on (_.id === _.board)
       } yield (boardObj, postObj))
     val list = queryVal.result.map { rows => rows.length }
     db.run(list)
@@ -102,15 +102,20 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
     db.run(update)
   }
 
+  private def getPosts(field: String, filter: String) =
+    field match {
+      case "title" => posts.getQuery().filter(_.deleted === false).filter(_.title like filter)
+      case "content" => posts.getQuery().filter(_.deleted === false).filter(_.content like filter)
+      case _ => posts.getQuery().filter(_.deleted === false)
+    }
+
   /** Return a page of (Post,Board) */
-  def postList(key: String, page: Int = 0, pageSize: Int = 10, orderBy: Int = 1, filter: String = "%"): Future[Page[(Board, Post)]] = {
+  def postList(key: String, page: Int = 0, pageSize: Int = 10, orderBy: Int = 1, field: String = "", filter: String = "%"): Future[Page[(Board, Post)]] = {
 
     val offset = pageSize * page
     val initialQuery =
       (for {
-        (boardObj, postObj) <- query joinLeft posts.getQuery() on (_.id === _.board)
-        if boardObj.key === key
-        // if computer.name.toLowerCase like filter.toLowerCase
+        (boardObj, postObj) <- query.filter(_.key === key) joinLeft getPosts(field, filter) on (_.id === _.board)
       } yield (boardObj, postObj))
       // } yield (postObj, boardObj.map(_.id), boardObj.map(_.key), boardObj.map(_.name)))
 
@@ -122,7 +127,7 @@ class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
     }
 
     for {
-      totalRows <- postCount(key, filter)
+      totalRows <- postCount(key, field, filter)
       list = sortedQuery.drop(offset).take(pageSize).result.map { rows => rows.collect { case (board, Some(post)) => (board, post) } }
       result <- db.run(list)
     } yield Page(result, page, offset, totalRows)

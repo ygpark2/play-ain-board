@@ -56,7 +56,7 @@ POST        /board/new                         controllers.Board.handleNewBoard(
 # Post
 GET         /post/:board_key/new               controllers.Post.newPost(board_key)
 POST        /post/:board_key/new               controllers.Post.handleNewPost(board_key)
-GET         /post/:board_key/list              controllers.Post.listPost(board_key, p:Int ?= 0, s:Int ?= 4, f ?= "")
+GET         /post/:board_key/list              controllers.Post.listPost(board_key, p:Int ?= 0, o:Int ?= 4, f ?= "", s ?= "")
 GET         /post/:board_key/view/:id          controllers.Post.viewPost(board_key, id)
 GET         /post/:board_key/edit/:id          controllers.Post.editPost(board_key, id)
 POST        /post/:board_key/edit/:id          controllers.Post.handleEditPost(board_key, id)

@@ -47,17 +47,13 @@ class Post @Inject()(val config: Config,
   }
 
   def newPost(board_key: String) = Secure("FormClient") { profiles =>
-    Action { request =>
-      val board = Await.result(boards.findByKey(board_key), Duration.Inf)
-      board match {
-        case Some(b) => {
-          Ok(views.html.board.post.newForm(Some(profiles), postForms.newForm, b))
+    Action.async { implicit request =>
+      boards.findByKey(board_key).map( v => {
+        v match {
+          case Some(b) => Ok(views.html.board.post.newForm(Some(profiles), postForms.newForm, b))
+          case _ => Ok(views.html.error.notFound(request))
         }
-        case _ => {
-
-          Ok(views.html.error.notFound(request))
-        }
-      }
+      })
     }
   }
 
@@ -83,7 +79,7 @@ class Post @Inject()(val config: Config,
              enable_notice: Boolean,
              enable_receive_email: Boolean */
 
-          val postInfo = PostInfo(0, 0, 0, 0, "", 0, "", 0, 0)
+          val postInfo = PostInfo(0, 0, 0, 0, request.remoteAddress, 0, request.headers.get("User-Agent").getOrElse(""), 0, 0)
           /*  link_count: Int,
               hit: Int,
               like: Int
@@ -97,35 +93,33 @@ class Post @Inject()(val config: Config,
             java.sql.Timestamp.valueOf(LocalDateTime.now()), java.sql.Timestamp.valueOf(LocalDateTime.now()), "", 0,
             java.sql.Timestamp.valueOf(LocalDateTime.now()), postUser, postConf, postInfo, false)
 
-          for {
-            id <- postForms.posts.insert(post)
-          } yield {
-            println("created id => " + id)
-            if (id > 0) {
+          postForms.posts.insert(post).map(v => {
+            if (v > 0) {
               Redirect(routes.Post.listPost(board_key))
             } else {
               Ok(views.html.board.post.newForm(Some(profiles), postForms.newForm, boardVal))
             }
-          }
+          })
         }
       )
     }
   }
 
   def editPost(board_key: String, id: String) = Secure("FormClient") { profiles =>
-    Action { request =>
-      val board = Await.result(boards.findByIdJoinPost(id), Duration.Inf)
-      board.head match {
-        case (b, p) => {
-          val formData = NewPostFormData(p.title, p.content, p.password, p.postUser.username, p.postUser.email, p.postUser.homepage,
-            p.postConf.enable_secret, p.postConf.enable_html, p.postConf.enable_notice)
-          val filledNewForm = postForms.newForm.fill(formData)
-          Ok(views.html.board.post.editForm(Some(profiles), filledNewForm, b, p))
+    Action.async { implicit request =>
+      boards.findByIdJoinPost(id).map( v => {
+        v.head match {
+          case (b, p) => {
+            val formData = NewPostFormData(p.title, p.content, p.password, p.postUser.username, p.postUser.email, p.postUser.homepage,
+              p.postConf.enable_secret, p.postConf.enable_html, p.postConf.enable_notice)
+            val filledNewForm = postForms.newForm.fill(formData)
+            Ok(views.html.board.post.editForm(Some(profiles), filledNewForm, b, p))
+          }
+          case _ => {
+            Ok(views.html.error.notFound(request))
+          }
         }
-        case _ => {
-          Ok(views.html.error.notFound(request))
-        }
-      }
+      })
     }
   }
 
@@ -176,42 +170,51 @@ class Post @Inject()(val config: Config,
   }
 
   def deletePost(board_key: String, id: String) = Secure("FormClient") { profiles =>
-    Action { request =>
-      val board = Await.result(boards.findByIdJoinPost(id), Duration.Inf)
-      board.head match {
-        case (b, p) => {
-          postForms.posts.delete(UUID.fromString(id))
-          Redirect(routes.Post.listPost(board_key))
+    Action.async { implicit request =>
+      boards.findByIdJoinPost(id).map(v => {
+        v.head match {
+          case (b, p) => {
+            postForms.posts.delete(UUID.fromString(id))
+            Redirect(routes.Post.listPost(board_key))
+          }
+          case _ => {
+            Ok(views.html.error.notFound(request))
+          }
         }
-        case _ => {
-          Ok(views.html.error.notFound(request))
-        }
-      }
+      })
     }
   }
 
   def viewPost(board_key: String, id: String) = Secure("AnonymousClient, FormClient") { profiles =>
-    Action { request =>
-      val board = Await.result(boards.findByIdJoinPost(id), Duration.Inf)
-      board.head match {
-        case (b, p) => {
-          // increase hit count
-          profiles.foreach(println)
-          val hit = p.postInfo.hit + 1
-          postForms.posts.update(p.incHit(hit))
-          val comments = Await.result(commentForms.comments.findByPost(id), Duration.Inf)
-          Ok(views.html.board.post.view(Some(profiles), commentForms.newForm, p, b, comments))
+    Action.async { implicit request =>
+      val dts =
+        (for {
+          bps <- boards.findByIdJoinPost(id)
+          cs <- commentForms.comments.findByPost(id)
+        } yield (bps, cs))
+
+      dts.map( v =>
+        v match {
+          case (bps, cs) => {
+            bps.head match {
+              case (b, p) => {
+                // increase hit count
+                val hit = p.postInfo.hit + 1
+                postForms.posts.update(p.incHit(hit))
+                Ok( views.html.board.post.view(Some(profiles), commentForms.newForm, b, p, cs) )
+              }
+              case _ => Ok( views.html.error.notFound(request) )
+            }
+          }
+          case _ => Ok( views.html.error.notFound(request) )
         }
-        case _ => {
-          Ok(views.html.error.notFound(request))
-        }
-      }
+      )
     }
   }
 
-  def listPost(board_key: String, page: Int, orderBy: Int, filter: String) = Secure("AnonymousClient, FormClient") { profiles =>
+  def listPost(board_key: String, page: Int, orderBy: Int, field: String, filter: String) = Secure("AnonymousClient, FormClient") { profiles =>
     Action.async { implicit request =>
-      val boardList = boards.postList(board_key, page = page, orderBy = orderBy, filter = ("%" + filter + "%"))
+      val boardList = boards.postList(board_key, page = page, orderBy = orderBy, field = field, filter = ("%" + filter + "%"))
       boardList.map(ps => {
         Ok(views.html.board.post.list(Some(profiles), ps, orderBy, filter, board_key))
       })

@@ -82,11 +82,9 @@ class Comments @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   def findByPost(post_id: String): Future[List[Comment]] =
     db.run(query.filter(_.post === UUID.fromString(post_id)).to[List].result)
 
-  def all(): Future[Seq[Comment]] =
-    db.run(query.result)
+  def all(): Future[Seq[Comment]] = db.run(query.result)
 
-  def _deleteAllInBoard(board: UUID): Future[Int] =
-    db.run(query.filter(_.board === board).delete)
+  def _deleteAllInBoard(board: UUID): Future[Int] = db.run(query.filter(_.board === board).delete)
 
   protected class CommentsTable(tag: Tag) extends AbstractTable(tag, TableName) {
 
