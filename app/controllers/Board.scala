@@ -17,6 +17,7 @@ import org.pac4j.jwt.profile.JwtGenerator
 import org.pac4j.play.PlayWebContext
 import org.pac4j.play.scala._
 import org.pac4j.play.store.PlaySessionStore
+import org.webjars.play.WebJarsUtil
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -30,7 +31,7 @@ class Board @Inject()(val config: Config,
                       override val messagesApi: MessagesApi,
                       val boardForms: BoardForms,
                       val playSessionStore: PlaySessionStore,
-                      implicit val webJarAssets: WebJarAssets,
+                      implicit val webJarsUtil: WebJarsUtil,
                       val cc: ControllerComponents,
                       val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 

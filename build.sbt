@@ -2,6 +2,11 @@ name := """play-ain-board"""
 
 version := "1.0-SNAPSHOT"
 
+// lazy val webJarsPlay = RootProject(file("..").getAbsoluteFile.toURI)
+// lazy val root = (project in file(".")).enablePlugins(PlayScala).dependsOn(webJarsPlay)
+
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
+
 scalaVersion := "2.12.3"
 
 val playPac4jVersion = "4.0.0"
@@ -9,15 +14,6 @@ val pac4jVersion = "2.1.0"
 val playVersion = "2.6.6"
 
 scalacOptions := Seq("-feature", "-deprecation")
-
-// routesGenerator := StaticRoutesGenerator
-routesGenerator := InjectedRoutesGenerator
-
-resolvers ++= Seq(
-    Resolver.mavenLocal,
-    "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
-    "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/"
-)
 
 libraryDependencies ++= Seq(
     guice,
@@ -56,8 +52,17 @@ libraryDependencies ++= Seq(
     specs2 % Test
 )
 
-lazy val webJarsPlay = RootProject(file("..").getAbsoluteFile.toURI)
+resolvers ++= Seq(
+    Resolver.mavenLocal,
+    "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+    "Sonatype snapshots repository" at "https://oss.sonatype.org/content/repositories/snapshots/"
+)
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala).dependsOn(webJarsPlay)
+// routesGenerator := StaticRoutesGenerator
+routesGenerator := InjectedRoutesGenerator
+
+// lazy val webJarsPlay = RootProject(file("..").getAbsoluteFile.toURI)
+
+// lazy val root = (project in file(".")).enablePlugins(PlayScala).dependsOn(webJarsPlay)
 
 // fork in run := true

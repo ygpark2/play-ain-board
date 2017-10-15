@@ -23,6 +23,7 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import play.libs.concurrent.HttpExecutionContext
 import com.github.t3hnar.bcrypt._
+import org.webjars.play.WebJarsUtil
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{Await, Future}
@@ -36,7 +37,7 @@ class Post @Inject()(val config: Config,
                      val commentForms: CommentForms,
                      val boards: Boards,
                      val playSessionStore: PlaySessionStore,
-                     implicit val webJarAssets: WebJarAssets,
+                     implicit val webJarsUtil: WebJarsUtil,
                      val cc: ControllerComponents,
                      val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 

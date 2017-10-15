@@ -1,4 +1,4 @@
-@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], scripts: Html = Html(""))(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(profiles: Option[List[org.pac4j.core.profile.CommonProfile]], scripts: Html = Html(""))(content: Html)(implicit messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 <!doctype html>
 <html class="no-js" lang="en" dir="ltr">
@@ -9,13 +9,15 @@
 
     <title>Autobot</title>
 
-    <link href="@routes.Assets.at("images/favicon.png")" rel="shortcut icon"></link>
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")"></link>
-    <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("material.min.css"))"></link>
+    <link href="@routes.Assets.versioned("images/favicon.png")" rel="shortcut icon"></link>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")"></link>
 
-    <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))"></script>
-    <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("material.min.js"))"></script>
-    <script type="text/javascript" src="@routes.Assets.at("javascripts/app.js")"></script>
+    @Html(webJarsUtil.css("material.min.css"))
+
+    @Html(webJarsUtil.script("jquery.min.js"))
+    @Html(webJarsUtil.script("material.min.js"))
+
+    <script type="text/javascript" src="@routes.Assets.versioned("javascripts/app.js")"></script>
 
     <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>

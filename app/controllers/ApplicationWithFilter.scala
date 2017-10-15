@@ -12,6 +12,7 @@ import org.pac4j.jwt.profile.JwtGenerator
 import org.pac4j.play.PlayWebContext
 import org.pac4j.play.scala.Security
 import org.pac4j.play.store.PlaySessionStore
+import org.webjars.play.WebJarsUtil
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.libs.json.Json
@@ -23,7 +24,7 @@ import scala.collection.JavaConversions._
 class ApplicationWithFilter @Inject() (val config: Config,
                                        override val messagesApi: MessagesApi,
                                        val playSessionStore: PlaySessionStore,
-                                       implicit val webJarAssets: WebJarAssets,
+                                       implicit val webJarsUtil: WebJarsUtil,
                                        val cc: ControllerComponents,
                                        val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 

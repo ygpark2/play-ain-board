@@ -36,6 +36,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import com.github.t3hnar.bcrypt._
 import org.joda.time.DateTime
+import org.webjars.play.WebJarsUtil
 
 class Authentication @Inject() (val config: Config,
                                 override val messagesApi: MessagesApi,
@@ -43,7 +44,7 @@ class Authentication @Inject() (val config: Config,
                                 val userForms: UserForms,
                                 val playSessionStore: PlaySessionStore,
                                 implicit val mailService: MailService,
-                                implicit val webJarAssets: WebJarAssets,
+                                implicit val webJarsUtil: WebJarsUtil,
                                 val cc: ControllerComponents,
                                 val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 

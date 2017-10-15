@@ -12,6 +12,7 @@ import org.pac4j.core.profile._
 import org.pac4j.play.PlayWebContext
 import org.pac4j.play.scala._
 import org.pac4j.play.store.PlaySessionStore
+import org.webjars.play.WebJarsUtil
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.libs.concurrent.HttpExecutionContext
@@ -27,7 +28,7 @@ class Comment @Inject()(val config: Config,
                         val commentForms: CommentForms,
                         val boards: Boards,
                         val playSessionStore: PlaySessionStore,
-                        implicit val webJarAssets: WebJarAssets,
+                        implicit val webJarsUtil: WebJarsUtil,
                         val cc: ControllerComponents,
                         val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 

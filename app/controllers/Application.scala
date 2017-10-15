@@ -23,13 +23,14 @@ import org.pac4j.play.store.PlaySessionStore
 import scala.collection.JavaConversions._
 import forms.UserForms
 import models.Users
+import org.webjars.play.WebJarsUtil
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 class Application @Inject()(val config: Config,
                              override val messagesApi: MessagesApi,
                              val userForms: UserForms,
                              val playSessionStore: PlaySessionStore,
-                             implicit val webJarAssets: WebJarAssets,
+                             implicit val webJarsUtil: WebJarsUtil,
                              val cc: ControllerComponents,
                              val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 
