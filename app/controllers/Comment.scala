@@ -23,12 +23,13 @@ import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 class Comment @Inject()(val config: Config,
-                        val messagesApi: MessagesApi,
+                        override val messagesApi: MessagesApi,
                         val commentForms: CommentForms,
                         val boards: Boards,
                         val playSessionStore: PlaySessionStore,
                         implicit val webJarAssets: WebJarAssets,
-                        override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
+                        val cc: ControllerComponents,
+                        val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 
   private def getProfiles(implicit request: RequestHeader): List[CommonProfile] = {
     val webContext = new PlayWebContext(request, playSessionStore)
@@ -144,7 +145,7 @@ class Comment @Inject()(val config: Config,
   }
 
   def deleteComment(board_key: String, post_id: String, id: String) = Secure("FormClient") { profiles =>
-    Action { request =>
+    Action { implicit request =>
       val board = Await.result(boards.findByIdJoinPost(id), Duration.Inf)
       board.head match {
         case (b, p) => {

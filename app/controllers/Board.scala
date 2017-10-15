@@ -27,11 +27,12 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class Board @Inject()(val config: Config,
-                      val messagesApi: MessagesApi,
+                      override val messagesApi: MessagesApi,
                       val boardForms: BoardForms,
                       val playSessionStore: PlaySessionStore,
                       implicit val webJarAssets: WebJarAssets,
-                      override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
+                      val cc: ControllerComponents,
+                      val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 
   private def getProfiles(implicit request: RequestHeader): List[CommonProfile] = {
     val webContext = new PlayWebContext(request, playSessionStore)
@@ -40,7 +41,7 @@ class Board @Inject()(val config: Config,
     asScalaBuffer(profiles).toList
   }
 
-  def newBoard = Action { request =>
+  def newBoard = Action { implicit request =>
     val formClient = config.getClients.findClient("FormClient").asInstanceOf[FormClient]
     // Ok(views.html.loginForm.render(formClient.getCallbackUrl))
     Ok(views.html.board.newForm(boardForms.newForm))

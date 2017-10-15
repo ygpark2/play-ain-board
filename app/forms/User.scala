@@ -14,7 +14,6 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
 
-
 case class LoginFormData(email: String, password: String)
 
 case class SignupFormData(name:String, email: String, password: String, passwordAgain:String)
@@ -24,7 +23,7 @@ case class ProfileFormData(
                           address2: String, introduction: String
                          )
 // @Singleton
-class UserForms @Inject()(val users: Users) {
+class UserForms @Inject()(implicit messages: MessagesApi, val users: Users) {
 
   val login = Form(
     mapping(
@@ -51,7 +50,7 @@ class UserForms @Inject()(val users: Users) {
   val resetPasswordForm = Form(tuple(
     "password1" -> passwordValidation,
     "password2" -> nonEmptyText
-  ) verifying (Messages("auth.passwords.notequal"), passwords => passwords._2 == passwords._1))
+  ) verifying (messages("auth.passwords.notequal"), passwords => passwords._2 == passwords._1))
 
   private[this] def userForm(passwordMapping:Mapping[String]) = Form(
     mapping(

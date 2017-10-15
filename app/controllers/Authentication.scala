@@ -38,13 +38,14 @@ import com.github.t3hnar.bcrypt._
 import org.joda.time.DateTime
 
 class Authentication @Inject() (val config: Config,
-                                val messagesApi: MessagesApi,
+                                override val messagesApi: MessagesApi,
                                 val tokenService: MailTokenUserService,
                                 val userForms: UserForms,
                                 val playSessionStore: PlaySessionStore,
                                 implicit val mailService: MailService,
                                 implicit val webJarAssets: WebJarAssets,
-                                override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
+                                val cc: ControllerComponents,
+                                val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 
   // implicit val ms = mailService
   // val tokenService = new MailTokenUserService()

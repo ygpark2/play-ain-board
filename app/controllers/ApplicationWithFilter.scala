@@ -21,10 +21,11 @@ import play.libs.concurrent.HttpExecutionContext
 import scala.collection.JavaConversions._
 
 class ApplicationWithFilter @Inject() (val config: Config,
-                                       val messagesApi: MessagesApi,
+                                       override val messagesApi: MessagesApi,
                                        val playSessionStore: PlaySessionStore,
                                        implicit val webJarAssets: WebJarAssets,
-                                       override val ec: HttpExecutionContext) extends Controller with Security[CommonProfile] with I18nSupport {
+                                       val cc: ControllerComponents,
+                                       val ec: HttpExecutionContext) extends AbstractController(cc) with Security[CommonProfile] with I18nSupport {
 
   private def getProfiles(implicit request: RequestHeader): List[CommonProfile] = {
     val webContext = new PlayWebContext(request, playSessionStore)
@@ -34,7 +35,7 @@ class ApplicationWithFilter @Inject() (val config: Config,
   }
 
   def index = Secure("AnonymousClient", "csrfToken") { profiles =>
-    Action { request =>
+    Action { implicit request =>
       val webContext = new PlayWebContext(request, playSessionStore)
       val csrfToken = webContext.getSessionAttribute(Pac4jConstants.CSRF_TOKEN).asInstanceOf[String]
       // val messages = messagesApi.preferred(request)

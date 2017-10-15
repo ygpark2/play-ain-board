@@ -1,4 +1,4 @@
-@(loginForm: Form[forms.LoginFormData], loginUrl: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(loginForm: Form[forms.LoginFormData], loginUrl: String)(implicit request: RequestHeader, messagesProvider: MessagesProvider, webJarAssets: WebJarAssets)
 
 @_template(None) {
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" style="max-width: 402px;">
