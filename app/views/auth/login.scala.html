@@ -6,7 +6,7 @@
         <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
             <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--12-col">
-                    <h3 class="mdl-cell mdl-cell--12-col">@messages("signin")</h3>
+                    <h3 class="mdl-cell mdl-cell--12-col">@messagesProvider.messages("signin")</h3>
                 </div>
             </div>
             <div class="section__circle-container mdl-cell">
@@ -41,7 +41,7 @@
                 </form>
                 <div class="mdl-grid mdl-grid--no-spacing">
                     <div class="mdl-cell mdl-cell--11-col mdl-cell--1-offset mdl-textfield--align-right">
-                        <p>@Messages("signin.forgot.question")<a href="routes.Authentication.forgotPassword">@Messages("signin.forgot")</a></p>
+                        <p>@messagesProvider.messages("signin.forgot.question")<a href="routes.Authentication.forgotPassword">@messagesProvider.messages("signin.forgot")</a></p>
                     </div>
                 </div>
 
