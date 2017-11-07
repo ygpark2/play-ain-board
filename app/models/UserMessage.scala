@@ -45,7 +45,7 @@ case class UserMessage(id: UUID,
 
 class UserMessages @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[UserMessage] {
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = UserMessagesTable
   override protected val query = TableQuery[SpecificTable]

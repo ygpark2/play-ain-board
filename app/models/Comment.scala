@@ -68,7 +68,7 @@ case class Comment(id: UUID,
 
 class Comments @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[Comment] {
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = CommentsTable
   override protected val query = TableQuery[SpecificTable]

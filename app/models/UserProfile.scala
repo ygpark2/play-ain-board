@@ -66,7 +66,7 @@ class UserProfiles @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
 
   */
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = UserProfilesTable
   override protected val query = TableQuery[SpecificTable]

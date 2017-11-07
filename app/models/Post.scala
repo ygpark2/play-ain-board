@@ -94,7 +94,7 @@ case object PublishingStatus extends PostStatus
 
 class Posts @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[Post] {
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = PostsTable
   override protected val query = TableQuery[SpecificTable]

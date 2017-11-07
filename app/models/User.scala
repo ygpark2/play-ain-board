@@ -40,7 +40,7 @@ case class User( id: UUID,
 
 class Users @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[User] {
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = UsersTable
   override protected val query = TableQuery[SpecificTable]

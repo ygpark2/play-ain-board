@@ -27,7 +27,7 @@ case class BoardCategory(id: UUID,
 
 class BoardCategories @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[BoardCategory] {
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = BoardCategoriesTable
   override protected val query = TableQuery[SpecificTable]

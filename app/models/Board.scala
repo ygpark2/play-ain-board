@@ -26,7 +26,7 @@ case class Board(id: UUID, key: String, name: String, mobile_name: String, order
 
 class Boards @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[Board] {
 
-  import driver.api._
+  import profile.api._
 
   val posts: Posts = new Posts(dbConfigProvider)
   val comments: Comments = new Comments(dbConfigProvider)

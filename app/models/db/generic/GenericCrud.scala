@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 abstract class GenericCrud[EntityType <: HasId] extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  import driver.api._
+  import profile.api._
 
   type SpecificTable <: AbstractTable
   protected val query: TableQuery[SpecificTable]

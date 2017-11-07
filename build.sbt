@@ -12,6 +12,7 @@ scalaVersion := "2.12.3"
 val playPac4jVersion = "4.0.0"
 val pac4jVersion = "2.1.0"
 val playVersion = "2.6.6"
+val playMailerVersion = "6.0.1"
 
 scalacOptions := Seq("-feature", "-deprecation")
 
@@ -24,7 +25,9 @@ libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play-slick-evolutions" % "3.0.1",
     "com.h2database" % "h2" % "1.4.192",
 
-    "com.typesafe.play" %% "play-mailer" % "6.0.1",
+    "com.typesafe.play" %% "play-mailer" % playMailerVersion,
+    "com.typesafe.play" %% "play-mailer-guice" % playMailerVersion,
+
     "com.github.t3hnar" %% "scala-bcrypt" % "3.0",
 
     "org.pac4j" % "play-pac4j" % playPac4jVersion,

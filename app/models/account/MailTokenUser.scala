@@ -27,7 +27,7 @@ case class MailTokenUser( id: UUID,
 
 class MailTokenUsers @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends GenericCrud[MailTokenUser] {
 
-  import driver.api._
+  import profile.api._
 
   override type SpecificTable = MailTokenUsersTable
   override protected val query = TableQuery[SpecificTable]
